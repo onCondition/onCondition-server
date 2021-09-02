@@ -1,0 +1,27 @@
+{
+  "name": "oncondition",
+  "version": "1.0.0",
+  "description": "take a subjective view of your condition",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/onCondition/onCondition-server.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/onCondition/onCondition-server/issues"
+  },
+  "homepage": "https://github.com/onCondition/onCondition-server#readme",
+  "devDependencies": {
+    "husky": "^4.3.8"
+  },
+  "husky": {
+    "hooks": {
+      "pre-push": "git branch | grep \"*\" | egrep -v \"^\\* main$\""
+    }
+  }
+}
