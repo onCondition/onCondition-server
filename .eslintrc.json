@@ -18,7 +18,7 @@
     "function-paren-newline": [
       "error",
       {
-        "minItems": 5
+        "minItems": 4
       }
     ],
     "indent": ["error", 2],
@@ -71,7 +71,7 @@
       "error",
       {
         "consistent": true,
-        "minProperties": 3
+        "minProperties": 4
       }
     ],
     "object-curly-spacing": ["error", "always"],
