@@ -5,11 +5,21 @@ const CustomAlbum = require("../../models/CustomAlbum");
 const Comments = require("../../models/Comments");
 const { ERROR } = require("../../constants/messages");
 
+const { validateBody, isValidText } = require("../utils/validations");
+
 async function deleteCategory(req, res, next) {
   try {
     const { category } = req.body;
     const user = await User.findById(req.userId);
     const categoryNames = user.customCategories;
+
+    const invalidValues = validateBody([
+      [text, isValidText],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+    }
 
     if (!categoryNames.length) {
       throw createError(BAD_REQUEST, ERROR.INVALID_ALREADY_DELETED_CATEGORY);
@@ -35,6 +45,14 @@ async function addCategory(req, res, next) {
     const user = await User.findById(req.userId);
     const categoryNames = user.customCategories;
 
+    const invalidValues = validateBody([
+      [text, isValidText],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+    }
+
     if (Array.isArray(categoryNames) && categoryNames.length === 3) {
       throw createError(BAD_REQUEST, ERROR.INVALID_USING_MAX_CATEGORIES);
     }
@@ -55,9 +73,5 @@ async function addCategory(req, res, next) {
 async function getNewGoogleFitData(req, res, next) {
 
 }
-
-module.exports = {
-  deleteCategory, addCategory, getDataManually
-};
 
 module.exports = { deleteCategory, addCategory, getNewGoogleFitData };
