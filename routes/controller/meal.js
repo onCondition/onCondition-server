@@ -96,7 +96,6 @@ async function patchMealDetail(req, res, next) {
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
 
-    console.log(mealId);
     if (!isValidUrl(url)) {
       throw createError(BAD_REQUEST, ERROR.INVALID_URL);
     }
@@ -120,7 +119,6 @@ async function patchMealDetail(req, res, next) {
     res.status(OK);
     res.json({ result: "ok" });
   } catch (err) {
-    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
       return next(createError(BAD_REQUEST, `${errPaths}이(가) 유효하지 않습니다`));
@@ -131,7 +129,16 @@ async function patchMealDetail(req, res, next) {
 }
 
 async function deleteMealDetail(req, res, next) {
-  //
+  try {
+    const mealId = req.params.id;
+
+    await Meal.findByIdAndRemove(mealId);
+
+    res.status(OK);
+    res.json({ result: "ok" });
+  } catch (err) {
+    next(err);
+  }
 }
 
 module.exports = {
