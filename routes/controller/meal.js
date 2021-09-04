@@ -3,7 +3,7 @@ const mongoose = require("mongoose");
 
 const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
-const { OK, BAD_REQUEST } = require("../../constants/statusCodes");
+const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
 const {
   isValidUrl,
@@ -81,7 +81,16 @@ async function postMeal(req, res, next) {
 async function getMealDetail(req, res, next) {
   try {
     const mealId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(mealId)) {
+      throw createError(NOT_FOUND);
+    }
+
     const mealData = await Meal.findById(mealId).populate("comments");
+
+    if (!mealData) {
+      throw createError(NOT_FOUND);
+    }
 
     res.status(OK);
     res.json({ result: "ok", data: mealData });
@@ -93,6 +102,11 @@ async function getMealDetail(req, res, next) {
 async function patchMealDetail(req, res, next) {
   try {
     const mealId = req.params.id;
+
+    if (!mongoose.Types.ObjectId.isValid(mealId)) {
+      throw createError(NOT_FOUND);
+    }
+
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
 
@@ -112,9 +126,13 @@ async function patchMealDetail(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_RATING_TEXT);
     }
 
-    await Meal.findByIdAndUpdate(mealId, {
+    const result = await Meal.findByIdAndUpdate(mealId, {
       url, date, rating: { heartCount, text }
     });
+
+    if (!result) {
+      throw createError(NOT_FOUND);
+    }
 
     res.status(OK);
     res.json({ result: "ok" });
@@ -132,7 +150,15 @@ async function deleteMealDetail(req, res, next) {
   try {
     const mealId = req.params.id;
 
-    await Meal.findByIdAndRemove(mealId);
+    if (!mongoose.Types.ObjectId.isValid(mealId)) {
+      throw createError(NOT_FOUND);
+    }
+
+    const result = await Meal.findByIdAndRemove(mealId);
+
+    if (!result) {
+      throw createError(NOT_FOUND);
+    }
 
     res.status(OK);
     res.json({ result: "ok" });
