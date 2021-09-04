@@ -2,7 +2,6 @@ const createError = require("http-errors");
 const mongoose = require("mongoose");
 
 const Meal = require("../../models/Meal");
-const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST } = require("../../constants/statusCodes");
 
@@ -92,7 +91,43 @@ async function getMealDetail(req, res, next) {
 }
 
 async function patchMealDetail(req, res, next) {
-  //
+  try {
+    const mealId = req.params.id;
+    const { url, heartCount, text } = req.body;
+    const date = new Date(req.body.date);
+
+    console.log(mealId);
+    if (!isValidUrl(url)) {
+      throw createError(BAD_REQUEST, ERROR.INVALID_URL);
+    }
+
+    if (!isValidDate(date)) {
+      throw createError(BAD_REQUEST, ERROR.INVALID_DATE);
+    }
+
+    if (!isValidHeartCount(heartCount)) {
+      throw createError(BAD_REQUEST, ERROR.INVALID_HEART_COUNT);
+    }
+
+    if (!isValidText(text)) {
+      throw createError(BAD_REQUEST, ERROR.INVALID_RATING_TEXT);
+    }
+
+    await Meal.findByIdAndUpdate(mealId, {
+      url, date, rating: { heartCount, text }
+    });
+
+    res.status(OK);
+    res.json({ result: "ok" });
+  } catch (err) {
+    console.log(err);
+    if (err instanceof mongoose.Error.ValidationError) {
+      const errPaths = Object.keys(err.errors).join(", ");
+      return next(createError(BAD_REQUEST, `${errPaths}이(가) 유효하지 않습니다`));
+    }
+
+    next(err);
+  }
 }
 
 async function deleteMealDetail(req, res, next) {
