@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 const findOrCreate = require("mongoose-findorcreate");
 
 const userSchema = new mongoose.Schema({
-  email: {
+  uid: {
     type: String,
     required: true,
-    unique: true,
+    unique: true
   },
   profileUrl: {
     type: String,
