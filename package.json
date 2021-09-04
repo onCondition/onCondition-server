@@ -28,12 +28,24 @@
     "morgan": "~1.9.1"
   },
   "devDependencies": {
+    "eslint": "^7.30.0",
     "husky": "^4.3.8",
+    "lint-staged": "^11.1.2",
     "nodemon": "^2.0.12"
   },
   "husky": {
     "hooks": {
-      "pre-push": "git branch | grep \"*\" | egrep -v \"^\\* main$\""
+      "pre-push": "git branch | grep \"*\" | egrep -v \"^\\* main$\"",
+      "pre-commit": "lint-staged"
     }
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix"
+    ]
+  },
+  "engines": {
+    "node": "14.17.6",
+    "npm": "6.14.15"
   }
 }
