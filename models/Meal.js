@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
-const ratingSchema = require("./subDocs/ratingSchema");
+const ratingSchema = require("./subDocuments/ratingSchema");
 const { isValidUrl } = require("../routes/utils/validations");
 const { ERROR } = require("../constants/messages");
 
