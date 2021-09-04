@@ -2,6 +2,7 @@ const createError = require("http-errors");
 const mongoose = require("mongoose");
 
 const Meal = require("../../models/Meal");
+const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST } = require("../../constants/statusCodes");
 
@@ -79,7 +80,15 @@ async function postMeal(req, res, next) {
 }
 
 async function getMealDetail(req, res, next) {
-  //
+  try {
+    const mealId = req.params.id;
+    const mealData = await Meal.findById(mealId).populate("comments");
+
+    res.status(OK);
+    res.json({ result: "ok", data: mealData });
+  } catch (err) {
+    next(err);
+  }
 }
 
 async function patchMealDetail(req, res, next) {
