@@ -5,12 +5,7 @@ const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
-const {
-  isValidUrl,
-  isValidDate,
-  isValidHeartCount,
-  isValidText
-} = require("../utils/validations");
+const { validateBody } = require("../utils/validations");
 
 async function getMeal(req, res, next) {
   try {
@@ -38,24 +33,10 @@ async function getMeal(req, res, next) {
 
 async function postMeal(req, res, next) {
   try {
+    validateBody(req.body);
+
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
-
-    if (!isValidUrl(url)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_URL);
-    }
-
-    if (!isValidDate(date)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_DATE);
-    }
-
-    if (!isValidHeartCount(heartCount)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_HEART_COUNT);
-    }
-
-    if (!isValidText(text)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_RATING_TEXT);
-    }
 
     const newMeal = {
       userId: req.userId,
@@ -71,7 +52,7 @@ async function postMeal(req, res, next) {
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
-      return next(createError(BAD_REQUEST, `${errPaths}이(가) 유효하지 않습니다`));
+      return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
     next(err);
@@ -107,24 +88,10 @@ async function patchMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
+    validateBody(req.body);
+
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
-
-    if (!isValidUrl(url)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_URL);
-    }
-
-    if (!isValidDate(date)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_DATE);
-    }
-
-    if (!isValidHeartCount(heartCount)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_HEART_COUNT);
-    }
-
-    if (!isValidText(text)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_RATING_TEXT);
-    }
 
     const result = await Meal.findByIdAndUpdate(mealId, {
       url, date, rating: { heartCount, text }
@@ -139,7 +106,7 @@ async function patchMealDetail(req, res, next) {
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
-      return next(createError(BAD_REQUEST, `${errPaths}이(가) 유효하지 않습니다`));
+      return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
     next(err);
