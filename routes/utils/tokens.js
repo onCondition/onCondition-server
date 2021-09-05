@@ -1,14 +1,11 @@
 const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
 const {
-  ISSUER, ACCESS_DURATION, REFRESH_DURATION
+  ISSUER, ACCESS_DURATION, REFRESH_DURATION,
 } = require("../../constants/tokenInfos");
 const { ERROR } = require("../../constants/messages");
 const { UNAUTHORIZED } = require("../../constants/statusCodes");
-const {
-  TOKEN_EXPIRED_ERROR,
-  JSON_WEB_TOKEN_ERROR
-} = require("../../constants/errors");
+const { TokenExpiredError, JsonWebTokenError } = jwt;
 
 function generateToken(userId, isRefreshToken = false) {
   const secret = isRefreshToken
@@ -32,11 +29,11 @@ function verifyToken(token, isRefreshToken = false) {
 
     return decoded;
   } catch (err) {
-    if (err?.name === TOKEN_EXPIRED_ERROR) {
+    if (err instanceof TokenExpiredError) {
       throw createError(UNAUTHORIZED, ERROR.TOKEN_EXPIRED);
     }
 
-    if (err?.name === JSON_WEB_TOKEN_ERROR) {
+    if (err instanceof JsonWebTokenError) {
       throw createError(UNAUTHORIZED, ERROR.INVALID_TOKEN);
     }
 
