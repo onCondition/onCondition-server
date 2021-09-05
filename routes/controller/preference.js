@@ -24,7 +24,6 @@ async function deleteCategory(req, res, next) {
 
     res.statusCode = 200;
     res.json({ result: "OK"});
-
   } catch (err) {
     next(err);
   }
@@ -48,14 +47,13 @@ async function addCategory(req, res, next) {
 
     res.statusCode = 201;
     res.json({ result: "OK", modifiedCategory });
-
   } catch (err) {
     next(err);
   }
 };
 
-async function getDataManually(req, res, next) {
+async function getNewGoogleFitData(req, res, next) {
 
 };
 
-module.exports = { deleteCategory, addCategory, getDataManually };
+module.exports = { deleteCategory, addCategory, getNewGoogleFitData };
