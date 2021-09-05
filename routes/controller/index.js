@@ -1,3 +1,4 @@
+const createError = require("http-errors");
 const firebase = require("../../config/firebase");
 const User = require("../../models/User");
 const { ERROR } = require("../../constants/messages");
@@ -9,10 +10,10 @@ async function postLogin(req, res, next) {
 
   try {
     const {
-      uid, name, picture: profileUrl
+      uid, name, picture: profileUrl,
     } = await firebase.auth().verifyIdToken(idToken);
     const { doc: user } = await User.findOrCreate({
-      uid, name, profileUrl
+      uid, name, profileUrl,
     });
 
     const accessToken = generateToken(user._id);
@@ -21,12 +22,11 @@ async function postLogin(req, res, next) {
     res.status(OK);
     res.json({
       accessToken,
-      refreshToken
+      refreshToken,
     });
   } catch (err) {
     next(createError(BAD_REQUEST, ERROR.INVALID_TOKEN));
   }
-
 }
 
 function postRefresh(req, res, next) {
@@ -48,5 +48,5 @@ async function getCondition(req, res, next) {
 }
 
 module.exports = {
-  postLogin, postRefresh, getCondition
+  postLogin, postRefresh, getCondition,
 };
