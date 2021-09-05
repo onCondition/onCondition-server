@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-const ratingSchema = require("../models/subDocuments/ratingSchema");
+const ratingSchema = require("../models/subDocuments/Rating");
 
 const customGridSchema = new mongoose.Schema({
   category: {
