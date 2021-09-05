@@ -24,8 +24,7 @@ async function postLogin(req, res, next) {
       refreshToken
     });
   } catch (err) {
-    res.status(BAD_REQUEST);
-    res.json({ error: ERROR.INVALID_TOKEN });
+    next(createError(BAD_REQUEST, ERROR.INVALID_TOKEN));
   }
 
 }
