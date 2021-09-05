@@ -4,7 +4,7 @@ const indexController = require("../controller/index");
 
 router.post("/login", indexController.postLogin);
 
-router.post("/logout", indexController.postLogout);
+router.post("/refresh", indexController.postRefresh);
 
 router.get("/users/:userId/condition", indexController.getCondition);
 
