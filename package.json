@@ -25,6 +25,7 @@
     "mongodb": "^4.1.1",
     "mongoose": "^6.0.4",
     "mongoose-findorcreate": "^3.0.0",
+    "mongoose-paginate-v2": "^1.4.2",
     "morgan": "~1.9.1"
   },
   "devDependencies": {
