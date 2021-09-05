@@ -107,6 +107,7 @@
       }
     ],
     "space-infix-ops": "error",
-    "valid-typeof": "error"
+    "valid-typeof": "error",
+    "comma-dangle": ["error", "always-multiline"]
   }
 }
