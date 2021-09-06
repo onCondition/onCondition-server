@@ -1,5 +1,5 @@
 const ISSUER = "onCondition-admin";
-const ACCESS_DURATION = "1000ms";
+const ACCESS_DURATION = "1d";
 const REFRESH_DURATION = "7d";
 
 module.exports = {
