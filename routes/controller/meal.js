@@ -36,9 +36,8 @@ async function getMeal(req, res, next) {
 
 async function postMeal(req, res, next) {
   try {
-    const { file, heartCount, text } = req.body;
+    const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
-    const url = await getImageUrl(file) || "";
 
     const invalidValues = validateBody([
       [url, isValidUrl],
@@ -63,6 +62,7 @@ async function postMeal(req, res, next) {
     res.status(OK);
     res.json({ result: "ok" });
   } catch (err) {
+    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
       return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
