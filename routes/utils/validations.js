@@ -1,3 +1,8 @@
+const createError = require("http-errors");
+
+const { ERROR } = require("../../constants/messages");
+const { BAD_REQUEST } = require("../../constants/statusCodes");
+
 function isValidUrl(string) {
   let url = null;
 
@@ -25,9 +30,22 @@ function isValidText(text) {
   return typeof text === "string";
 }
 
+function validateBody(entries) {
+  const errors = [];
+
+  entries.forEach(([value, validate]) => {
+    if (!validate(value)) {
+      errors.push(value);
+    }
+  });
+
+  return errors.join(", ");
+}
+
 module.exports = {
   isValidUrl,
   isValidDate,
   isValidHeartCount,
-  isValidText
+  isValidText,
+  validateBody,
 };
