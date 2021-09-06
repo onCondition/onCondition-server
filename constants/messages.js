@@ -6,7 +6,7 @@ const ERROR = {
   INVALID_DATE: "유효하지 않은 날짜입니다",
   INVALID_HEART_COUNT: "유효하지 않은 만족도입니다",
   INVALID_RATING_TEXT: "유효하지 않은 평가문입니다",
-  INVALID_VALUE: "이(가) 유효하지 않습니다",
+  INVALID_VALUE: "은(는) 유효하지 않은 값입니다",
 };
 
 module.exports = { ERROR };

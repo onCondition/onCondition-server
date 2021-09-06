@@ -15,9 +15,7 @@ function isValidUrl(string) {
   return url.protocol === "http:" || url.protocol === "https:";
 }
 
-function isValidDate(string) {
-  const date = new Date(string);
-
+function isValidDate(date) {
   return !isNaN(date.getTime());
 }
 
@@ -32,27 +30,16 @@ function isValidText(text) {
   return typeof text === "string";
 }
 
-function validateBody({
-  url,
-  date,
-  heartCount,
-  text,
-}) {
-  if (url && !isValidUrl(url)) {
-    throw createError(BAD_REQUEST, ERROR.INVALID_URL);
-  }
+function validateBody(entries) {
+  const errors = [];
 
-  if (!isValidDate(date)) {
-    throw createError(BAD_REQUEST, ERROR.INVALID_DATE);
-  }
+  entries.forEach(([value, validate]) => {
+    if (!validate(value)) {
+      errors.push(value);
+    }
+  });
 
-  if (!isValidHeartCount(heartCount)) {
-    throw createError(BAD_REQUEST, ERROR.INVALID_HEART_COUNT);
-  }
-
-  if (text && !isValidText(text)) {
-    throw createError(BAD_REQUEST, ERROR.INVALID_RATING_TEXT);
-  }
+  return errors.join(", ");
 }
 
 module.exports = {

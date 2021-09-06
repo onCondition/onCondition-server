@@ -5,7 +5,9 @@ const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
-const { validateBody } = require("../utils/validations");
+const {
+  validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate
+} = require("../utils/validations");
 
 async function getMeal(req, res, next) {
   try {
@@ -33,10 +35,19 @@ async function getMeal(req, res, next) {
 
 async function postMeal(req, res, next) {
   try {
-    validateBody(req.body);
-
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
+
+    const invalidValues = validateBody([
+      [url, isValidUrl],
+      [heartCount, isValidHeartCount],
+      [text, isValidText],
+      [date, isValidDate],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+    }
 
     const newMeal = {
       userId: req.userId,
@@ -67,7 +78,13 @@ async function getMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const mealData = await Meal.findById(mealId).populate("comments");
+    const mealData = await Meal.findById(mealId).populate({
+      path: "comment",
+      populate: {
+        path: "creator",
+        select: "profileUrl, name"
+      }
+    });
 
     if (!mealData) {
       throw createError(NOT_FOUND);
