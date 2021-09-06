@@ -1,6 +1,7 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 
+const getImageUrl = require("../utils/getImageUrl");
 const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
@@ -35,8 +36,9 @@ async function getMeal(req, res, next) {
 
 async function postMeal(req, res, next) {
   try {
-    const { url, heartCount, text } = req.body;
+    const { file, heartCount, text } = req.body;
     const date = new Date(req.body.date);
+    const url = await getImageUrl(file) || "";
 
     const invalidValues = validateBody([
       [url, isValidUrl],

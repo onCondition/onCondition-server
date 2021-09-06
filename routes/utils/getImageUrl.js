@@ -1,4 +1,4 @@
-import s3 from "../../config/AWS";
+const s3 = require("../../config/AWS");
 
 async function getImgUrl(file) {
   const fileName = file.name;
@@ -15,4 +15,4 @@ async function getImgUrl(file) {
   return stored.Location;
 }
 
-export default getImgUrl;
+module.exports = getImgUrl;
