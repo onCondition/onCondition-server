@@ -1,24 +1,14 @@
-import { ERROR } from "../../constants/messages";
+const { verifyToken } = require("../utils/tokens");
 
-const firebase = require("../../config/firebase");
-const createError = require("http-errors");
+function requiresLogin(req, res, next) {
+  const { token: accessToken } = req.headers;
 
-async function requiresLogin(req, res, next) {
   try {
-    const token = req.headers.token;
-    const decodedToken = await firebase.auth().verifyIdToken(token);
-    req.uid = decodedToken.uid;
+    const user = verifyToken(accessToken);
 
+    req.userId = user.userId;
     next();
-  } catch(err) {
-    if (err.code == "auth/id-token-revoked") {
-      return next(createError(401, ERROR.TOKEN_EXPIRED));
-    }
-
-    if (err.code === "app/invalid-credential") {
-      return next(createError(401, ERROR.REQUIRE_LOGIN));
-    }
-
+  } catch (err) {
     next(err);
   }
 }

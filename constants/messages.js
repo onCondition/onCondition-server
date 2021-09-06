@@ -10,6 +10,7 @@ const ERROR = {
   INVALID_USING_MAX_CATEGORIES: "이미 최대 3개의 커스텀 카테고리를 모두 사용하고 있습니다.",
   INVALID_OVERLAP_CATEGORY_NAME: "이미 사용중인 카테고리 이름입니다.",
   INVALID_ALREADY_DELETED_CATEGORY: "이미 삭제된 카테고리입니다.",
+  INVALID_VALUE: "은(는) 유효하지 않은 값입니다",
 };
 
 module.exports = { ERROR };

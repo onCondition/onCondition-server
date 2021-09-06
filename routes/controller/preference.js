@@ -54,6 +54,10 @@ async function addCategory(req, res, next) {
 
 async function getNewGoogleFitData(req, res, next) {
 
+}
+
+module.exports = {
+  deleteCategory, addCategory, getDataManually
 };
 
 module.exports = { deleteCategory, addCategory, getNewGoogleFitData };
