@@ -11,7 +11,6 @@ const ratingSchema = new mongoose.Schema({
   },
   text: {
     type: String,
-    default: "",
   },
 });
 
