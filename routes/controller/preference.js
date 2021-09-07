@@ -4,6 +4,8 @@ const CustomGrid = require("../../models/CustomGrid");
 const CustomAlbum = require("../../models/CustomAlbum");
 const Comments = require("../../models/Comments");
 const { ERROR } = require("../../constants/messages");
+const { STATUS } = require("../../constants/statusCodes");
+const NUMBERS = require("../../constants/numbers");
 
 const { validateBody, isValidText } = require("../utils/validations");
 
@@ -14,30 +16,34 @@ async function deleteCategory(req, res, next) {
     const categoryNames = user.customCategories;
 
     const invalidValues = validateBody([
-      [text, isValidText],
+      [category, isValidText],
     ]);
 
     if (invalidValues.length) {
-      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+      throw createError(STATUS.BAD_REQUEST,
+        invalidValues + ERROR.INVALID_VALUE);
     }
 
     if (!categoryNames.length) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_ALREADY_DELETED_CATEGORY);
+      throw createError(STATUS.BAD_REQUEST,
+        ERROR.INVALID_ALREADY_DELETED_CATEGORY);
     }
 
-    if (!!categoryNames.includes(category)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_ALREADY_DELETED_CATEGORY);
+    if (categoryNames.includes(category)) {
+      throw createError(STATUS.BAD_REQUEST,
+        ERROR.INVALID_ALREADY_DELETED_CATEGORY);
     }
 
-    await User.findByIdAndUpdate(req.userId, { $pull: { "customCategories": { category } }});
+    await User.findByIdAndUpdate(req.userId,
+      { $pull: { customCategories: { category } } });
     await Comments.deleteMany({ category });
 
     res.statusCode = 200;
-    res.json({ result: "OK"});
+    res.json({ result: "OK" });
   } catch (err) {
     next(err);
   }
-};
+}
 
 async function addCategory(req, res, next) {
   try {
@@ -46,32 +52,33 @@ async function addCategory(req, res, next) {
     const categoryNames = user.customCategories;
 
     const invalidValues = validateBody([
-      [text, isValidText],
+      [category, isValidText],
     ]);
 
     if (invalidValues.length) {
-      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+      throw createError(STATUS.BAD_REQUEST,
+        invalidValues + ERROR.INVALID_VALUE);
     }
 
-    if (Array.isArray(categoryNames) && categoryNames.length === 3) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_USING_MAX_CATEGORIES);
+    if (Array.isArray(categoryNames)
+      && categoryNames.length === NUMBERS.MAX_CATEGORIES) {
+      throw createError(STATUS.BAD_REQUEST, ERROR.INVALID_USING_MAX_CATEGORIES);
     }
 
     if (Array.isArray(categoryNames) && categoryNames.includes(category)) {
-      throw createError(BAD_REQUEST, ERROR.INVALID_OVERLAP_CATEGORY_NAME);
+      throw createError(STATUS.BAD_REQUEST,
+        ERROR.INVALID_OVERLAP_CATEGORY_NAME);
     }
 
-    const modifiedCategory = await User.updateOne({ _id: req.userId },{ $push: { customCategories: [{category, categoryType}] }});
-
-    res.statusCode = 201;
-    res.json({ result: "OK", modifiedCategory });
+    const modifiedCategory = await User.updateOne({ _id: req.userId },
+      { $push: { customCategories: [{ category, categoryType }] } });
   } catch (err) {
     next(err);
   }
-};
+}
 
 async function getNewGoogleFitData(req, res, next) {
-
+//
 }
 
 module.exports = { deleteCategory, addCategory, getNewGoogleFitData };
