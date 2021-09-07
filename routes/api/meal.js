@@ -3,7 +3,7 @@ const router = express.Router();
 const mealController = require("../controller/meal");
 const requiresLogin = require("../middleware/requiresLogin");
 
-router.get("/", mealController.getMeal);
+router.get("/", requiresLogin, mealController.getMeal);
 
 router.post("/", requiresLogin, mealController.postMeal);
 

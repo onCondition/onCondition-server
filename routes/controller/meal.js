@@ -1,7 +1,6 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 
-const getImageUrl = require("../utils/getImageUrl");
 const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
@@ -62,9 +61,9 @@ async function postMeal(req, res, next) {
     res.status(OK);
     res.json({ result: "ok" });
   } catch (err) {
-    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
+
       return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
@@ -81,7 +80,7 @@ async function getMealDetail(req, res, next) {
     }
 
     const mealData = await Meal.findById(mealId).populate({
-      path: "comment",
+      path: "comments",
       populate: {
         path: "creator",
         select: "profileUrl, name",
@@ -95,6 +94,7 @@ async function getMealDetail(req, res, next) {
     res.status(OK);
     res.json({ result: "ok", data: mealData });
   } catch (err) {
+    console.log(err);
     next(err);
   }
 }
@@ -125,6 +125,7 @@ async function patchMealDetail(req, res, next) {
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
+
       return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
