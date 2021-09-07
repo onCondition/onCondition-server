@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
+const findOrCreate = require("mongoose-findorcreate");
 
 const { ERROR } = require("../constants/messages");
 
@@ -21,5 +22,6 @@ const stepSchema = new mongoose.Schema({
 
 stepSchema.path("_id");
 stepSchema.plugin(mongoosePaginate);
+stepSchema.plugin(findOrCreate);
 
 module.exports = mongoose.model("Step", stepSchema);
