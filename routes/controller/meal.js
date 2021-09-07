@@ -1,7 +1,7 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const s3 = require("../../config/AWS");
 
-const getImageUrl = require("../utils/getImageUrl");
 const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
@@ -62,9 +62,9 @@ async function postMeal(req, res, next) {
     res.status(OK);
     res.json({ result: "ok" });
   } catch (err) {
-    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
+
       return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
@@ -81,7 +81,7 @@ async function getMealDetail(req, res, next) {
     }
 
     const mealData = await Meal.findById(mealId).populate({
-      path: "comment",
+      path: "comments",
       populate: {
         path: "creator",
         select: "profileUrl, name",
@@ -107,10 +107,19 @@ async function patchMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    validateBody(req.body);
-
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
+
+    const invalidValues = validateBody([
+      [url, isValidUrl],
+      [heartCount, isValidHeartCount],
+      [text, isValidText],
+      [date, isValidDate],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+    }
 
     const result = await Meal.findByIdAndUpdate(mealId, {
       url, date, rating: { heartCount, text },
@@ -125,6 +134,7 @@ async function patchMealDetail(req, res, next) {
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
+
       return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
@@ -145,6 +155,13 @@ async function deleteMealDetail(req, res, next) {
     if (!result) {
       throw createError(NOT_FOUND);
     }
+
+    const imageKey = result.url.split("/album1/").pop();
+
+    s3.deleteObject({
+      bucket: "on-condition",
+      key: `album1/${imageKey}`,
+    });
 
     res.status(OK);
     res.json({ result: "ok" });
