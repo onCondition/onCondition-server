@@ -159,8 +159,12 @@ async function deleteMealDetail(req, res, next) {
     const imageKey = result.url.split("/album1/").pop();
 
     s3.deleteObject({
-      bucket: "on-condition",
-      key: `album1/${imageKey}`,
+      Bucket: "on-condition",
+      Key: `album1/${imageKey}`,
+    }, function (err) {
+      if (err) {
+        next(err);
+      }
     });
 
     res.status(OK);
