@@ -1,5 +1,6 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const s3 = require("../../config/AWS");
 
 const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
@@ -94,7 +95,6 @@ async function getMealDetail(req, res, next) {
     res.status(OK);
     res.json({ result: "ok", data: mealData });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 }
@@ -107,10 +107,19 @@ async function patchMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    validateBody(req.body);
-
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
+
+    const invalidValues = validateBody([
+      [url, isValidUrl],
+      [heartCount, isValidHeartCount],
+      [text, isValidText],
+      [date, isValidDate],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+    }
 
     const result = await Meal.findByIdAndUpdate(mealId, {
       url, date, rating: { heartCount, text },
@@ -146,6 +155,13 @@ async function deleteMealDetail(req, res, next) {
     if (!result) {
       throw createError(NOT_FOUND);
     }
+
+    const imageKey = result.url.split("/album1/").pop();
+
+    s3.deleteObject({
+      bucket: "on-condition",
+      key: `album1/${imageKey}`,
+    });
 
     res.status(OK);
     res.json({ result: "ok" });
