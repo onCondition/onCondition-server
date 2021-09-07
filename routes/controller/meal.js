@@ -160,18 +160,15 @@ async function deleteMealDetail(req, res, next) {
 
     const imageKey = meal.url.split("/album1/").pop();
 
-    s3.deleteObject({
-      Bucket: "on-condition",
+    await s3.deleteObject({
+      Bucket: process.env.BUCKET_NAME,
       Key: `album1/${imageKey}`,
-    }, async function (err) {
-      if (err) {
-        return next(INTERNAL_SERVER_ERROR, err.message);
-      }
+    }).promise();
 
-      await meal.remove();
-      res.status(OK);
-      res.json({ result: "ok" });
-    });
+    await meal.remove();
+
+    res.status(OK);
+    res.json({ result: "ok" });
   } catch (err) {
     next(err);
   }
