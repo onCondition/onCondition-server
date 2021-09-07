@@ -24,7 +24,6 @@
     "express": "~4.16.1",
     "firebase-admin": "^9.11.1",
     "http-errors": "~1.6.3",
-    "moment": "^2.29.1",
     "mongodb": "^4.1.1",
     "mongoose": "^6.0.4",
     "mongoose-findorcreate": "^3.0.0",

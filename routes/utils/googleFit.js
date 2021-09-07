@@ -1,5 +1,3 @@
-const moment = require("moment");
-
 const {
   isValidText,
   isValidDate,
@@ -93,10 +91,21 @@ function parseSteps(steps) {
   return result;
 }
 
+function setTimeMidnight(dateObject = new Date()) {
+  const year = dateObject.getFullYear();
+  const month = dateObject.getMonth();
+  const date = dateObject.getDate();
+  const timeOmitted = new Date(
+    year, month, date, 0, 0, 0,
+  );
+
+  return timeOmitted;
+}
+
 function getDateMillis() {
-  const startTimeMillis = moment()
-    .subtract(STEP_DATA_LENGTH, "days").startOf("day").valueOf();
-  const endTimeMillis = moment().startOf("day").valueOf();
+  const endTime = setTimeMidnight();
+  const endTimeMillis = endTime.getTime();
+  const startTimeMillis = endTime.setDate(endTime.getDate() - STEP_DATA_LENGTH);
 
   return { startTimeMillis, endTimeMillis };
 }
