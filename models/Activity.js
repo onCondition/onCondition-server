@@ -1,7 +1,10 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
+const findOrCreate = require("mongoose-findorcreate");
 
 const ratingSchema = require("./subDocuments/Rating");
+const { isValidActivityType } = require("../routes/utils/validations");
+const { ERROR } = require("../constants/messages");
 
 const activitySchema = new mongoose.Schema({
   userId: {
@@ -25,6 +28,7 @@ const activitySchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
+    validate: [isValidActivityType, ERROR.INVALID_ACTIVITIY_TYPE],
   },
   rating: ratingSchema,
   comments: [{
@@ -35,5 +39,6 @@ const activitySchema = new mongoose.Schema({
 
 activitySchema.path("_id");
 activitySchema.plugin(mongoosePaginate);
+activitySchema.plugin(findOrCreate);
 
 module.exports = mongoose.model("Activity", activitySchema);
