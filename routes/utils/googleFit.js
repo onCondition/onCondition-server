@@ -29,7 +29,7 @@ function parseSessionEntry({
   const durationInMS = Number(endTimeMillis) - Number(startTimeMillis);
   const duration = Math.floor(durationInMS / ONE_MINUTE_IN_MS);
 
-  if (!isValidDuration) {
+  if (!isValidDuration(duration)) {
     return null;
   }
 

@@ -1,5 +1,6 @@
 /* eslint-disable max-len */
 const createError = require("http-errors");
+const mongoose = require("mongoose");
 const axios = require("axios");
 
 const Activity = require("../../models/Activity");
@@ -13,7 +14,7 @@ const {
 } = require("../utils/googleFit");
 
 const { ERROR } = require("../../constants/messages");
-const { UNAUTHORIZED, INTERNAL_SERVER_ERROR } = require("../../constants/statusCodes");
+const { BAD_REQUEST, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = require("../../constants/statusCodes");
 
 const SESSIONS_URL = "https://fitness.googleapis.com/fitness/v1/users/me/sessions";
 const DATASET_URL = "https://fitness.googleapis.com/fitness/v1/users/me/dataset:aggregate";
@@ -75,8 +76,22 @@ async function getGoogleFitStepData(accessToken) {
   }
 }
 
-async function updateModels({ sleeps, activities, steps }) {
-  // updateLogic
+async function updateModels({ sleeps, activities, steps }, userId) {
+  try {
+    const activitiesPromises = activities.map((activity) => Activity.findOrCreate(({ userId, ...activity })));
+    const sleepsPromises = sleeps.map((sleep) => Sleep.findOrCreate(({ userId, ...sleep })));
+    const { date, count } = steps.pop();
+
+    await Promise.all(sleepsPromises);
+    await Promise.all(activitiesPromises);
+    await Step.findOneAndUpdate({ userId }, { date, count }, { upsert: true });
+  } catch (err) {
+    if (err instanceof mongoose.Error.ValidationError) {
+      throw createError(BAD_REQUEST, ERROR.INVALID_VALUE);
+    }
+
+    throw err;
+  }
 }
 
 module.exports = {
