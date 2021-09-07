@@ -2,8 +2,6 @@ const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 const findOrCreate = require("mongoose-findorcreate");
 
-const { ERROR } = require("../constants/messages");
-
 const stepSchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,

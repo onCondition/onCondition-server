@@ -20,7 +20,7 @@ const SESSIONS_URL = "https://fitness.googleapis.com/fitness/v1/users/me/session
 const DATASET_URL = "https://fitness.googleapis.com/fitness/v1/users/me/dataset:aggregate";
 const STEP_DATA_TYPE_NAME = "com.google.step_count.delta";
 const STEP_DATA_SOURCE_ID = "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps";
-const ONE_DAY_IN_MS = 86400000;
+const ONE_DAY_IN_MS = 86_400_000;
 
 async function getGoogleFitSessionData(accessToken) {
   const headers = { Authorization: `Bearer ${accessToken}` };
