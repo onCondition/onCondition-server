@@ -12,6 +12,7 @@ const ERROR = {
   INVALID_ALREADY_DELETED_CATEGORY: "이미 삭제된 카테고리입니다.",
   CATEGORY_NOT_FOUND: "존재하지 않은 카테고리입니다",
   INVALID_VALUE: "은(는) 유효하지 않은 값입니다",
+  GOOGLE_API_NOT_AVAILABLE: "현재 구글 데이터 이용이 불가능합니다.",
 };
 
 module.exports = { ERROR };
