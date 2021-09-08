@@ -49,7 +49,7 @@ async function getGrid(req, res, next) {
     }
 
     const result = await CustomGrid.paginate(
-      { creator: userId }, pagenateOptions,
+      { creator: userId, category: categoryName }, pagenateOptions,
     );
 
     res.status(OK);
