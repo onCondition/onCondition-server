@@ -4,7 +4,7 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 const ratingSchema = require("./subDocuments/Rating");
 
 const customGridSchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -31,4 +31,3 @@ customGridSchema.path("_id");
 customGridSchema.plugin(mongoosePaginate);
 
 module.exports = mongoose.model("CustomGrid", customGridSchema);
-

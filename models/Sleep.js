@@ -5,7 +5,7 @@ const ratingSchema = require("./subDocuments/Rating");
 const { ERROR } = require("../constants/messages");
 
 const sleepSchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
