@@ -3,14 +3,14 @@ const router = express.Router();
 const albumController = require("../controller/customAlbum");
 const requiresLogin = require("../middleware/requiresLogin");
 
-router.get("/", requiresLogin, albumController.getAlbum);
+router.get("/:category/", requiresLogin, albumController.getAlbum);
 
-router.post("/", albumController.postAlbum);
+router.post("/:category/", albumController.postAlbum);
 
-router.get("/:id", albumController.getAlbumDetail);
+router.get("/:category/:id", albumController.getAlbumDetail);
 
-router.patch("/:id", albumController.patchAlbumDetail);
+router.patch("/:category/:id", albumController.patchAlbumDetail);
 
-router.delete("/:id", albumController.deleteAlbumDetail);
+router.delete("/:category/:id", albumController.deleteAlbumDetail);
 
 module.exports = router;
