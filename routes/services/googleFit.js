@@ -1,4 +1,3 @@
-/* eslint-disable max-len */
 const createError = require("http-errors");
 const mongoose = require("mongoose");
 const axios = require("axios");
@@ -7,20 +6,22 @@ const Activity = require("../../models/Activity");
 const Sleep = require("../../models/Sleep");
 const Step = require("../../models/Step");
 
-const {
-  parseSession,
-  parseSteps,
-  getDateMillis,
-} = require("../utils/googleFit");
+const { parseSession, parseSteps } = require("../utils/googleFit");
+const { getDateMillis } = require("../utils/times");
 
 const { ERROR } = require("../../constants/messages");
-const { BAD_REQUEST, UNAUTHORIZED, INTERNAL_SERVER_ERROR } = require("../../constants/statusCodes");
+const {
+  BAD_REQUEST,
+  UNAUTHORIZED,
+  INTERNAL_SERVER_ERROR,
+} = require("../../constants/statusCodes");
+const { ONE_DAY_IN_MS } = require("../../constants/times");
 
 const SESSIONS_URL = "https://fitness.googleapis.com/fitness/v1/users/me/sessions";
 const DATASET_URL = "https://fitness.googleapis.com/fitness/v1/users/me/dataset:aggregate";
 const STEP_DATA_TYPE_NAME = "com.google.step_count.delta";
 const STEP_DATA_SOURCE_ID = "derived:com.google.step_count.delta:com.google.android.gms:estimated_steps";
-const ONE_DAY_IN_MS = 86_400_000;
+const STEP_DATA_LENGTH = 1;
 
 async function getGoogleFitSessionData(accessToken) {
   const headers = { Authorization: `Bearer ${accessToken}` };
@@ -45,7 +46,7 @@ async function getGoogleFitSessionData(accessToken) {
 }
 
 async function getGoogleFitStepData(accessToken) {
-  const { startTimeMillis, endTimeMillis } = getDateMillis();
+  const { startTimeMillis, endTimeMillis } = getDateMillis(STEP_DATA_LENGTH);
   const headers = { Authorization: `Bearer ${accessToken}` };
   const body = {
     aggregateBy: [{
@@ -78,8 +79,12 @@ async function getGoogleFitStepData(accessToken) {
 
 async function updateModels({ sleeps, activities, steps }, userId) {
   try {
-    const activitiesPromises = activities.map((activity) => Activity.findOrCreate(({ userId, ...activity })));
-    const sleepsPromises = sleeps.map((sleep) => Sleep.findOrCreate(({ userId, ...sleep })));
+    const activitiesPromises = activities.map(
+      (activity) => Activity.findOrCreate(({ userId, ...activity })),
+    );
+    const sleepsPromises = sleeps.map(
+      (sleep) => Sleep.findOrCreate(({ userId, ...sleep })),
+    );
     const { date, count } = steps.pop();
 
     await Promise.all(sleepsPromises);

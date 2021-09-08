@@ -5,10 +5,10 @@ const {
 } = require("../utils/validations");
 const googleActivities = require("../../constants/googleActivities.json");
 
+const { ONE_MINUTE_IN_MS } = require("../../constants/times");
+
 const SLEEP = "Sleep";
 const SLEEP_CODE = 72;
-const ONE_MINUTE_IN_MS = 60_000;
-const STEP_DATA_LENGTH = 1;
 
 function parseSessionEntry({
   id: sessionId,
@@ -91,25 +91,4 @@ function parseSteps(steps) {
   return result;
 }
 
-function setTimeMidnight(dateObject = new Date()) {
-  const year = dateObject.getFullYear();
-  const month = dateObject.getMonth();
-  const date = dateObject.getDate();
-  const timeOmitted = new Date(
-    year, month, date, 0, 0, 0,
-  );
-
-  return timeOmitted;
-}
-
-function getDateMillis() {
-  const endTime = setTimeMidnight();
-  const endTimeMillis = endTime.getTime();
-  const startTimeMillis = endTime.setDate(endTime.getDate() - STEP_DATA_LENGTH);
-
-  return { startTimeMillis, endTimeMillis };
-}
-
-module.exports = {
-  parseSession, parseSteps, getDateMillis,
-};
+module.exports = { parseSession, parseSteps };
