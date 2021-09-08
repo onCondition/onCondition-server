@@ -1,19 +1,33 @@
 const mongoose = require("mongoose");
-const ratingSchema = require("../models/subDocuments/Rating");
+const mongoosePaginate = require("mongoose-paginate-v2");
+
+const ratingSchema = require("./subDocuments/Rating");
 
 const customGridSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
+    index: "hashed",
+  },
   category: {
     type: String,
     required: true,
-    unique: true,
   },
   date: {
     type: Date,
+    required: true,
   },
-  comments: {
-    type: Array,
+  rating: {
+    type: ratingSchema,
   },
-  rating: ratingSchema,
+  comments: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Comment",
+  }],
 });
 
-module.exports = mongoose.model("CustomGrape", customGridSchema);
+customGridSchema.path("_id");
+customGridSchema.plugin(mongoosePaginate);
+
+module.exports = mongoose.model("CustomGrid", customGridSchema);
