@@ -2,38 +2,38 @@ const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
 const ratingSchema = require("./subDocuments/Rating");
-const { isValidUrl } = require("../routes/utils/validations");
 const { ERROR } = require("../constants/messages");
 
-const customAlbumSchema = new mongoose.Schema({
+const activitySchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
     index: "hashed",
   },
-  category: {
+  sessionId: {
     type: String,
     required: true,
   },
-  url: {
-    type: String,
-    validate: [ isValidUrl, ERROR.INVALID_URL],
-  },
-  date: {
+  startTime: {
     type: Date,
     required: true,
   },
-  rating: {
-    type: ratingSchema,
+  duration: {
+    type: Number,
   },
+  type: {
+    type: String,
+    required: true,
+  },
+  rating: ratingSchema,
   comments: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
   }],
 });
 
-customAlbumSchema.path("_id");
-customAlbumSchema.plugin(mongoosePaginate);
+activitySchema.path("_id");
+activitySchema.plugin(mongoosePaginate);
 
-module.exports = mongoose.model("CustomAlbum", customAlbumSchema);
+module.exports = mongoose.model("Activity", activitySchema);
