@@ -18,7 +18,7 @@ const customAlbumSchema = new mongoose.Schema({
   },
   url: {
     type: String,
-    validate: [ isValidUrl, ERROR.INVALID_URL],
+    validate: [isValidUrl, ERROR.INVALID_URL],
   },
   date: {
     type: Date,
