@@ -4,7 +4,9 @@ const s3 = require("../../config/AWS");
 
 const Meal = require("../../models/Meal");
 const { ERROR } = require("../../constants/messages");
-const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
+const {
+  OK, BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR,
+} = require("../../constants/statusCodes");
 
 const {
   validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate,
@@ -57,10 +59,10 @@ async function postMeal(req, res, next) {
       rating: { heartCount, text },
     };
 
-    await Meal.create(newMeal);
+    const data = await Meal.create(newMeal);
 
     res.status(OK);
-    res.json({ result: "ok" });
+    res.json({ result: "ok", data });
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
@@ -150,18 +152,20 @@ async function deleteMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const result = await Meal.findByIdAndRemove(mealId);
+    const meal = await Meal.findById(mealId);
 
-    if (!result) {
+    if (!meal) {
       throw createError(NOT_FOUND);
     }
 
-    const imageKey = result.url.split("/album1/").pop();
+    const imageKey = meal.url.split("/album1/").pop();
 
-    s3.deleteObject({
-      bucket: "on-condition",
-      key: `album1/${imageKey}`,
-    });
+    await s3.deleteObject({
+      Bucket: process.env.BUCKET_NAME,
+      Key: `album1/${imageKey}`,
+    }).promise();
+
+    await meal.remove();
 
     res.status(OK);
     res.json({ result: "ok" });
