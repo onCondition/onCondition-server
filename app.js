@@ -12,6 +12,7 @@ const meal = require("./routes/api/meal");
 const comment = require("./routes/api/comment");
 const preference = require("./routes/api/preference");
 const image = require("./routes/api/image");
+const googleFit = require("./routes/api/googleFit");
 
 app.use(logger("dev"));
 app.use(express.json());
@@ -22,6 +23,7 @@ app.use("/meal", meal);
 app.use("/comments", comment);
 app.use("/preference", preference);
 app.use("/image", image);
+app.use("/googleFit", googleFit);
 
 app.use(handleNotFound);
 app.use(handleDefaultError);

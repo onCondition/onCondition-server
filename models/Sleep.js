@@ -1,8 +1,8 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
+const findOrCreate = require("mongoose-findorcreate");
 
 const ratingSchema = require("./subDocuments/Rating");
-const { ERROR } = require("../constants/messages");
 
 const sleepSchema = new mongoose.Schema({
   userId: {
@@ -31,5 +31,6 @@ const sleepSchema = new mongoose.Schema({
 
 sleepSchema.path("_id");
 sleepSchema.plugin(mongoosePaginate);
+sleepSchema.plugin(findOrCreate);
 
 module.exports = mongoose.model("Sleep", sleepSchema);
