@@ -19,8 +19,10 @@ async function getMeal(req, res, next) {
       sort: { date: -1 },
     };
 
-    if (req.page) {
-      pagenateOptions.page = req.page;
+    const { page } = req.headers;
+
+    if (page) {
+      pagenateOptions.page = page;
     }
 
     const result = await Meal.paginate({ userId: req.userId }, pagenateOptions);
@@ -54,10 +56,13 @@ async function postMeal(req, res, next) {
 
     const newMeal = {
       userId: req.userId,
-      url,
       date,
       rating: { heartCount, text },
     };
+
+    if (url) {
+      newMeal.url = url;
+    }
 
     const data = await Meal.create(newMeal);
 
