@@ -15,12 +15,6 @@
     "dot-notation": "error",
     "eol-last": "error",
     "eqeqeq": "error",
-    "function-paren-newline": [
-      "error",
-      {
-        "minItems": 4
-      }
-    ],
     "indent": ["error", 2],
     "key-spacing": [
       "error",
