@@ -51,10 +51,8 @@ async function addCategory(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_OVERLAP_CATEGORY_NAME);
     }
 
-    const modifiedCategory = await User.updateOne(
-      { _id: req.userId },
-      { $push: { customCategories: [{ category, categoryType }] } },
-    );
+    const modifiedCategory = await User.updateOne({ _id: req.userId },
+      { $push: { customCategories: [{ category, categoryType }] } });
 
     res.statusCode = 201;
     res.json({ result: "OK", modifiedCategory });

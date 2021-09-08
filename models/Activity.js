@@ -2,35 +2,38 @@ const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
 const ratingSchema = require("./subDocuments/Rating");
-
-const { isValidUrl } = require("../routes/utils/validations");
 const { ERROR } = require("../constants/messages");
 
-const mealSchema = new mongoose.Schema({
+const activitySchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
     index: "hashed",
   },
-  url: {
+  sessionId: {
     type: String,
-    validate: [ isValidUrl, ERROR.INVALID_URL],
+    required: true,
   },
-  date: {
+  startTime: {
     type: Date,
     required: true,
   },
-  rating: {
-    type: ratingSchema,
+  duration: {
+    type: Number,
   },
+  type: {
+    type: String,
+    required: true,
+  },
+  rating: ratingSchema,
   comments: [{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Comment",
   }],
 });
 
-mealSchema.path("_id");
-mealSchema.plugin(mongoosePaginate);
+activitySchema.path("_id");
+activitySchema.plugin(mongoosePaginate);
 
-module.exports = mongoose.model("Meal", mealSchema);
+module.exports = mongoose.model("Activity", activitySchema);
