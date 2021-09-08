@@ -2,7 +2,6 @@ const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
 
 const ratingSchema = require("./subDocuments/Rating");
-const { ERROR } = require("../constants/messages");
 
 const activitySchema = new mongoose.Schema({
   userId: {
