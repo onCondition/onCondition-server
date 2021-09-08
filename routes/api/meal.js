@@ -1,10 +1,11 @@
 const express = require("express");
 const router = express.Router();
 const mealController = require("../controller/meal");
+const requiresLogin = require("../middleware/requiresLogin");
 
-router.get("/", mealController.getMeal);
+router.get("/", requiresLogin, mealController.getMeal);
 
-router.post("/", mealController.postMeal);
+router.post("/", requiresLogin, mealController.postMeal);
 
 router.get("/:id", mealController.getMealDetail);
 
