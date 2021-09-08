@@ -2,7 +2,7 @@ const createError = require("http-errors");
 const User = require("../../models/User");
 const CustomGrid = require("../../models/CustomGrid");
 const CustomAlbum = require("../../models/CustomAlbum");
-const Comments = require("../../models/Comment");
+const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const { BAD_REQUEST } = require("../../constants/statusCodes");
 const NUMBERS = require("../../constants/numbers");
@@ -25,7 +25,7 @@ async function deleteCategory(req, res, next) {
       req.userId, { $pull: { customCategories: { category } } },
     );
 
-    await Comments.deleteMany({ category });
+    await Comment.deleteMany({ category });
 
     res.statusCode = 200;
     res.json({ result: "OK" });

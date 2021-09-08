@@ -4,9 +4,9 @@ const commentSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: [ "meal", "activity", "sleep", "custom-grape", "custom-album"],
+    enum: [ "Meal", "Activity", "Sleep", "CustomGrape", "CustomAlbum"],
   },
-  ratingId: {
+  rating: {
     type: mongoose.Schema.Types.ObjectId,
     refPath: "category",
     required: true,
