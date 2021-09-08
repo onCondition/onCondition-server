@@ -17,6 +17,7 @@
     "url": "https://github.com/onCondition/onCondition-server/issues"
   },
   "dependencies": {
+    "aws-sdk": "^2.983.0",
     "debug": "~2.6.9",
     "dotenv": "^10.0.0",
     "express": "~4.16.1",
@@ -25,7 +26,10 @@
     "mongodb": "^4.1.1",
     "mongoose": "^6.0.4",
     "mongoose-findorcreate": "^3.0.0",
-    "morgan": "~1.9.1"
+    "mongoose-paginate-v2": "^1.4.2",
+    "morgan": "~1.9.1",
+    "multer": "^1.4.3",
+    "multer-s3": "^2.9.0"
   },
   "devDependencies": {
     "eslint": "^7.30.0",

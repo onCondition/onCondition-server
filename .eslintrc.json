@@ -41,7 +41,7 @@
     "no-duplicate-imports": "error",
     "no-empty-function": "error",
     "no-lonely-if": "error",
-    "no-magic-numbers": "error",
+    "no-magic-numbers": ["error", { "ignore": [0, 1] }],
     "no-multi-spaces": "error",
     "no-multiple-empty-lines": [
       "error",
@@ -86,7 +86,10 @@
     ],
     "object-shorthand": ["error"],
     "operator-linebreak": ["error", "before"],
-    "padding-line-between-statements": "error",
+    "padding-line-between-statements": [
+      "error",
+      { "blankLine": "always", "prev": "*", "next": "return" }
+    ],
     "prefer-const": [
       "error",
       {
@@ -111,6 +114,7 @@
     ],
     "space-infix-ops": "error",
     "valid-typeof": "error",
-    "comma-dangle": ["error", "always-multiline"]
+    "comma-dangle": ["error", "always-multiline"],
+    "padded-blocks": ["error", { "blocks": "never" }]
   }
 }

@@ -6,7 +6,9 @@ exports.handleNotFound = function (req, res, next) {
   next(createError(NOT_FOUND));
 };
 
-exports.handleDefaultError = function (err, req, res, next) {
+exports.handleDefaultError = function (
+  err, req, res, next,
+) {
   const message = req.app.get("env") === "development"
     ? err.message
     : ERROR.INTERNAL_SERVER_ERROR;
