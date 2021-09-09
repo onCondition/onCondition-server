@@ -5,10 +5,10 @@ const requiresLogin = require("../middleware/requiresLogin");
 
 router.get("/", requiresLogin, activityController.getActivity);
 
-router.get("/:id", activityController.getActivityDetail);
+router.get("/:id", requiresLogin, activityController.getActivityDetail);
 
-router.patch("/:id", activityController.patchActivityDetail);
+router.patch("/:id", requiresLogin, activityController.patchActivityDetail);
 
-router.delete("/:id", activityController.deleteActivityDetail);
+router.delete("/:id", requiresLogin, activityController.deleteActivityDetail);
 
 module.exports = router;
