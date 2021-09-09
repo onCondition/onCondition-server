@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const Activity = require("../../models/Activity");
 const Step = require("../../models/Step");
 const Comment = require("../../models/Comment");
+const defaultOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
@@ -15,10 +16,7 @@ async function getActivity(req, res, next) {
   try {
     const { userId } = req;
     const { page } = req.headers;
-    const pagenateOptions = {
-      limit: 7,
-      sort: { date: -1 },
-    };
+    const pagenateOptions = { ...defaultOption };
 
     if (page) {
       pagenateOptions.page = page;

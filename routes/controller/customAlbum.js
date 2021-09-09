@@ -5,7 +5,7 @@ const s3 = require("../../config/AWS");
 const Album = require("../../models/CustomAlbum");
 const User = require("../../models/User");
 const Comment = require("../../models/Comment");
-const pagenateOption = require("../../config/paginateOption");
+const defaultOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
@@ -30,7 +30,7 @@ async function getAlbum(req, res, next) {
     }
 
     const pagenateOptions = {
-      ...pagenateOption,
+      ...defaultOption,
     };
 
     if (page) {
