@@ -107,13 +107,15 @@ async function getCondition(req, res, next) {
     }];
 
   try {
-    const stepData = await Step.findOne({ userId: creator,
+    const step = await Step.findOne({ userId: creator,
       date: pastMidnight });
     const activityData = await Activity.aggregate(dataPipeLine).exec();
     const mealData = await Meal.aggregate(dataPipeLine).exec();
     const sleepData = await Sleep.aggregate(dataPipeLine).exec();
     const albumData = await Album.aggregate(customDataPipeLine).exec();
     const gridData = await Grid.aggregate(customDataPipeLine).exec();
+
+    const stepData = (!step) ? 0 : step.count;
 
     res.status(OK);
     res.json({
