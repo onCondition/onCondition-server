@@ -6,7 +6,7 @@ const commentSchema = new mongoose.Schema({
     required: true,
     enum: [ "Meal", "Activity", "Sleep", "CustomGrape", "CustomAlbum"],
   },
-  rating: {
+  ratingId: {
     type: mongoose.Schema.Types.ObjectId,
     refPath: "category",
     required: true,
