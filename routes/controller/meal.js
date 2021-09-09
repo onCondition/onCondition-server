@@ -3,9 +3,10 @@ const mongoose = require("mongoose");
 const s3 = require("../../config/AWS");
 
 const Meal = require("../../models/Meal");
+const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const {
-  OK, BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR,
+  OK, BAD_REQUEST, NOT_FOUND,
 } = require("../../constants/statusCodes");
 
 const {
@@ -19,13 +20,15 @@ async function getMeal(req, res, next) {
       sort: { date: -1 },
     };
 
+    const { userId } = req;
     const { page } = req.headers;
 
     if (page) {
       pagenateOptions.page = page;
     }
 
-    const result = await Meal.paginate({ userId: req.userId }, pagenateOptions);
+    const result = await Meal.paginate({ creator: userId }, pagenateOptions);
+
     res.status(OK);
     res.json({
       result: "ok",
@@ -55,7 +58,7 @@ async function postMeal(req, res, next) {
     }
 
     const newMeal = {
-      userId: req.userId,
+      creator: req.userId,
       date,
       rating: { heartCount, text },
     };
@@ -128,16 +131,18 @@ async function patchMealDetail(req, res, next) {
       throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
 
-    const result = await Meal.findByIdAndUpdate(mealId, {
-      url, date, rating: { heartCount, text },
-    });
+    const data = await Meal.findOneAndUpdate(
+      { _id: mealId, creator: req.userId },
+      { date, rating: { heartCount, text } },
+      { new: true },
+    );
 
-    if (!result) {
+    if (!data) {
       throw createError(NOT_FOUND);
     }
 
     res.status(OK);
-    res.json({ result: "ok" });
+    res.json({ result: "ok", data });
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
@@ -157,7 +162,10 @@ async function deleteMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const meal = await Meal.findById(mealId);
+    const meal = await Meal.findOne({
+      _id: mealId,
+      creator: req.userId,
+    });
 
     if (!meal) {
       throw createError(NOT_FOUND);
@@ -170,7 +178,8 @@ async function deleteMealDetail(req, res, next) {
       Key: `album1/${imageKey}`,
     }).promise();
 
-    await meal.remove();
+    await meal.deleteOne();
+    await Comment.deleteMany({ ratingId: meal._id });
 
     res.status(OK);
     res.json({ result: "ok" });
