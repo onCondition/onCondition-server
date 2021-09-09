@@ -3,7 +3,7 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 const findOrCreate = require("mongoose-findorcreate");
 
 const stepSchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,

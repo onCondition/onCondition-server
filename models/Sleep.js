@@ -5,7 +5,7 @@ const findOrCreate = require("mongoose-findorcreate");
 const ratingSchema = require("./subDocuments/Rating");
 
 const sleepSchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
