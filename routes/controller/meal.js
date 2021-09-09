@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const s3 = require("../../config/AWS");
 
 const Meal = require("../../models/Meal");
+const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const {
   OK, BAD_REQUEST, NOT_FOUND,
@@ -27,6 +28,7 @@ async function getMeal(req, res, next) {
     }
 
     const result = await Meal.paginate({ creator: userId }, pagenateOptions);
+
     res.status(OK);
     res.json({
       result: "ok",
@@ -177,6 +179,7 @@ async function deleteMealDetail(req, res, next) {
     }).promise();
 
     await meal.deleteOne();
+    await Comment.deleteMany({ ratingId: meal._id });
 
     res.status(OK);
     res.json({ result: "ok" });

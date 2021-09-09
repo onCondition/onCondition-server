@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 
 const Grid = require("../../models/CustomGrid");
 const User = require("../../models/User");
+const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
@@ -206,6 +207,8 @@ async function deleteGridDetail(req, res, next) {
     if (!grid) {
       throw createError(NOT_FOUND);
     }
+
+    await Comment.deleteMany({ ratingId: grid._id });
 
     res.status(OK);
     res.json({ result: "ok" });
