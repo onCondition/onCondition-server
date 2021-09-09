@@ -4,7 +4,7 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 const { ERROR } = require("../constants/messages");
 
 const stepSchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,

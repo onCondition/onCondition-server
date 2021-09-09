@@ -4,7 +4,7 @@ const mongoosePaginate = require("mongoose-paginate-v2");
 const ratingSchema = require("./subDocuments/Rating");
 
 const activitySchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -14,7 +14,7 @@ const activitySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  startTime: {
+  date: {
     type: Date,
     required: true,
   },

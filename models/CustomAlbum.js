@@ -6,7 +6,7 @@ const { isValidUrl } = require("../routes/utils/validations");
 const { ERROR } = require("../constants/messages");
 
 const customAlbumSchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
