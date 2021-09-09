@@ -5,7 +5,7 @@ const requiresLogin = require("../middleware/requiresLogin");
 
 router.get("/", requiresLogin, activityController.getActivity);
 
-router.get("/:id", requiresLogin, activityController.getActivityDetail);
+router.get("/:id", activityController.getActivityDetail);
 
 router.patch("/:id", requiresLogin, activityController.patchActivityDetail);
 

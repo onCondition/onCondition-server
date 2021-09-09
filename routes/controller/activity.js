@@ -113,9 +113,7 @@ async function deleteActivityDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const activity = await Activity.findByIdAndUpdate(
-      activityId, { $unset: { rating: null, comments: [] } }, { new: true },
-    );
+    const activity = await Activity.findByIdAndDelete(activityId);
 
     if (!activity) {
       throw createError(NOT_FOUND, ERROR.SESSION_NOT_FOUND);
