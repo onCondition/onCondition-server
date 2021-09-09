@@ -4,7 +4,7 @@ const commentSchema = new mongoose.Schema({
   category: {
     type: String,
     required: true,
-    enum: [ "Meal", "Activity", "Sleep", "CustomGrape", "CustomAlbum"],
+    enum: [ "Meal", "Activity", "Sleep", "CustomGrid", "CustomAlbum"],
   },
   ratingId: {
     type: mongoose.Schema.Types.ObjectId,
