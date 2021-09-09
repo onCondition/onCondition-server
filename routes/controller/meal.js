@@ -4,6 +4,7 @@ const s3 = require("../../config/AWS");
 
 const Meal = require("../../models/Meal");
 const Comment = require("../../models/Comment");
+const defaultOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
 const {
   OK, BAD_REQUEST, NOT_FOUND,
@@ -15,10 +16,7 @@ const {
 
 async function getMeal(req, res, next) {
   try {
-    const pagenateOptions = {
-      limit: 7,
-      sort: { date: -1 },
-    };
+    const pagenateOptions = { ...defaultOption };
 
     const { userId } = req;
     const { page } = req.headers;
