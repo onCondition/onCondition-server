@@ -10,9 +10,9 @@ function getPastISOTime(today) {
   const pastAWeekAgoInMS = pastMidnightInMS - NUMBERS.A_WEEK_IN_MS;
   const pastAMonthAgoInMS = pastMidnightInMS - NUMBERS.A_MONTH_IN_MS;
 
-  const pastMidnight = new Date(pastMidnightInMS).toISOString();
-  const pastAWeekAgo = new Date(pastAWeekAgoInMS).toISOString();
-  const pastAMonthAgo = new Date(pastAMonthAgoInMS).toISOString();
+  const pastMidnight = new Date(pastMidnightInMS);
+  const pastAWeekAgo = new Date(pastAWeekAgoInMS);
+  const pastAMonthAgo = new Date(pastAMonthAgoInMS);
 
   return { pastMidnight, pastAWeekAgo, pastAMonthAgo };
 }
