@@ -4,6 +4,8 @@ const s3 = require("../../config/AWS");
 
 const Album = require("../../models/CustomAlbum");
 const User = require("../../models/User");
+const Comment = require("../../models/Comment");
+const pagenateOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
@@ -28,8 +30,7 @@ async function getAlbum(req, res, next) {
     }
 
     const pagenateOptions = {
-      limit: 7,
-      sort: { date: -1 },
+      ...pagenateOption,
     };
 
     if (page) {
@@ -210,6 +211,7 @@ async function deleteAlbumDetail(req, res, next) {
     }).promise();
 
     await album.deleteOne();
+    await Comment.deleteMany({ ratingId: album._id });
 
     res.status(OK);
     res.json({ result: "ok" });
