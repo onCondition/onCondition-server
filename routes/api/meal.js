@@ -9,8 +9,8 @@ router.post("/", requiresLogin, mealController.postMeal);
 
 router.get("/:id", mealController.getMealDetail);
 
-router.patch("/:id", mealController.patchMealDetail);
+router.patch("/:id", requiresLogin, mealController.patchMealDetail);
 
-router.delete("/:id", mealController.deleteMealDetail);
+router.delete("/:id", requiresLogin, mealController.deleteMealDetail);
 
 module.exports = router;

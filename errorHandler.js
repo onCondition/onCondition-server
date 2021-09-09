@@ -9,8 +9,10 @@ exports.handleNotFound = function (req, res, next) {
 exports.handleDefaultError = function (
   err, req, res, next,
 ) {
-  const message = req.app.get("env") === "development"
-    ? err.message
+  const message = (
+    req.app.get("env") === "development"
+    || err.status !== INTERNAL_SERVER_ERROR
+  ) ? err.message
     : ERROR.INTERNAL_SERVER_ERROR;
 
   // render the error page
