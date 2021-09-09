@@ -28,7 +28,7 @@ const activitySchema = new mongoose.Schema({
   type: {
     type: String,
     required: true,
-    validate: [isValidActivityType, ERROR.INVALID_ACTIVITIY_TYPE],
+    validate: [isValidActivityType, ERROR.INVALID_ACTIVITY_TYPE],
   },
   rating: ratingSchema,
   comments: [{
