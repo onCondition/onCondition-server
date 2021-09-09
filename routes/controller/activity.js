@@ -113,7 +113,9 @@ async function deleteActivityDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const activity = await Activity.findById(activityId);
+    const activity = await Activity.findByIdAndUpdate(
+      activityId, { $unset: { rating: null, comments: [] } }, { new: true },
+    );
 
     if (!activity) {
       throw createError(NOT_FOUND, ERROR.SESSION_NOT_FOUND);
@@ -122,7 +124,6 @@ async function deleteActivityDetail(req, res, next) {
     const { _id } = activity;
 
     await Comment.deleteMany({ ratingId: _id });
-    await activity.remove();
 
     res.status(OK);
     res.json({ result: "ok" });
