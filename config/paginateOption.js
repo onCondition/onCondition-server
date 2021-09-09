@@ -3,4 +3,4 @@ const pagenateOption = {
   sort: { date: -1 },
 };
 
-export default pagenateOption;
+module.exports = pagenateOption;
