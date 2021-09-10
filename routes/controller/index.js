@@ -59,8 +59,7 @@ function postRefresh(req, res, next) {
 
 async function getCondition(req, res, next) {
   try {
-    const user = await User.findOne(req.params.id);
-    const creator = user._id;
+    const creator = req.userId;
     const today = new Date();
     const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
 
