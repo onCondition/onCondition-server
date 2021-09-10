@@ -64,47 +64,63 @@ async function getCondition(req, res, next) {
   const today = new Date();
   const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
 
-  const dataPipeLine = [
-    { $match: {
+  const dataPipeLine = [{
+    $match: {
       creator,
       date: {
         $gte: pastAMonthAgo,
         $lte: pastMidnight,
       },
-    } }, { $group: {
-      _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
-      average: { $avg: "$rating.heartCount" },
-    } }, { $sort: { _id: -1 } },
+    },
+  }, { $group: {
+    _id: {
+      $dateToString: {
+        format: "%Y-%m-%d",
+        date: "$date",
+      },
+    },
+    average: {
+      $avg: "$rating.heartCount",
+    },
+  } }, {
+    $sort: {
+      _id: -1,
+    },
+  },
   ];
 
-  const customDataPipeLine = [
-    { $match: {
+  const customDataPipeLine = [{
+    $match: {
       creator,
       date: {
         $gte: pastAMonthAgo,
         $lte: pastMidnight,
       },
-    } }, {
-      $group: {
-        _id: { category: "$category", date: "$date" },
-        score: { $avg: "$rating.heartCount" },
-      },
-    }, {
-      $group: {
-        _id: "$_id.category",
-        data: {
-          $push: {
-            _id: {
-              $dateToString: {
-                format: "%Y-%m-%d",
-                date: "$_id.date",
-              },
-            },
-            average: { $avg: "$score" },
-          },
+    },
+  } ,{ $group: {
+    _id: {
+      category: "$category",
+      date: {
+        $dateToString: {
+          format: "%Y-%m-%d",
+          date: "$date",
         },
       },
-    }];
+    },
+    score: {
+      $avg: "$rating.heartCount",
+    },
+  } }, {
+    $group: {
+      _id: "$_id.category",
+      data: {
+        $push: {
+          _id: "$_id.date",
+          average: "$score",
+        },
+      },
+    },
+  }];
 
   try {
     const step = await Step.findOne({ userId: creator,
@@ -114,7 +130,6 @@ async function getCondition(req, res, next) {
     const sleepData = await Sleep.aggregate(dataPipeLine).exec();
     const albumData = await Album.aggregate(customDataPipeLine).exec();
     const gridData = await Grid.aggregate(customDataPipeLine).exec();
-
     const stepData = (!step) ? 0 : step.count;
 
     res.status(OK);
