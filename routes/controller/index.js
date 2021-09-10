@@ -16,5 +16,5 @@ async function getCondition(req, res, next) {
 }
 
 module.exports = {
-  postLogin, postLogout, getCondition
+  postLogin, postLogout, getCondition,
 };
