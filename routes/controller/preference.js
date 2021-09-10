@@ -6,6 +6,7 @@ const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const { BAD_REQUEST } = require("../../constants/statusCodes");
 const NUMBERS = require("../../constants/numbers");
+const { OK, CREATED } = require("../../constants/statusCodes");
 
 async function deleteCategory(req, res, next) {
   try {
@@ -27,7 +28,7 @@ async function deleteCategory(req, res, next) {
 
     await Comment.deleteMany({ category });
 
-    res.statusCode = 200;
+    res.status(OK);
     res.json({ result: "OK" });
   } catch (err) {
     next(err);
@@ -54,7 +55,7 @@ async function addCategory(req, res, next) {
     const modifiedCategory = await User.updateOne({ _id: req.userId },
       { $push: { customCategories: [{ category, categoryType }] } });
 
-    res.statusCode = 201;
+    res.status(CREATED);
     res.json({ result: "OK", modifiedCategory });
   } catch (err) {
     next(err);

@@ -15,7 +15,7 @@ const sleepSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  startTime: {
+  date: {
     type: Date,
     required: true,
   },
