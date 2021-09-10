@@ -9,6 +9,7 @@ const app = express();
 
 const index = require("./routes/api/index");
 const meal = require("./routes/api/meal");
+const sleep = require("./routes/api/sleep");
 const activity = require("./routes/api/activity");
 const customGrid = require("./routes/api/customGrid");
 const customAlbum = require("./routes/api/customAlbum");
@@ -23,6 +24,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/", index);
 app.use("/meal", meal);
+app.use("/sleep", sleep);
 app.use("/activity", activity);
 app.use("/customGrid", customGrid);
 app.use("/customAlbum", customAlbum);
