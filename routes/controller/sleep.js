@@ -43,7 +43,24 @@ async function getSleepDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const sleep = await Sleep.findById(sleepId);
+    const { heartCount, text } = req.body;
+
+    const invalidValues = validateBody([
+      [text, isValidText],
+      [heartCount, isValidHeartCount],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+    }
+
+    const sleep = await Sleep.findById(sleepId).populate({
+      path: "comments",
+      populate: {
+        path: "creator",
+        select: "profileUrl, name",
+      },
+    });
 
     if (!sleep) {
       throw createError(NOT_FOUND, ERROR.SESSION_NOT_FOUND);
@@ -111,7 +128,7 @@ async function deleteSleepDetail(req, res, next) {
     const deletedDoc = await Comment.deleteOne({ ratingId: sleep._id });
 
     if (deletedDoc === "Not Found") {
-      throw createError(NOT_FOUND, ERROR.NO_DOCS_TO_DELETE);
+      throw createError(NOT_FOUND, ERROR.INVALID_SLEEP_DATA);
     }
 
     res.status(OK);
@@ -122,5 +139,8 @@ async function deleteSleepDetail(req, res, next) {
 }
 
 module.exports = {
-  getSleep, getSleepDetail, patchSleepDetail, deleteSleepDetail,
+  getSleep,
+  getSleepDetail,
+  patchSleepDetail,
+  deleteSleepDetail,
 };
