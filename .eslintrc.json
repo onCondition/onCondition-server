@@ -15,12 +15,6 @@
     "dot-notation": "error",
     "eol-last": "error",
     "eqeqeq": "error",
-    "function-paren-newline": [
-      "error",
-      {
-        "minItems": 4
-      }
-    ],
     "indent": ["error", 2],
     "key-spacing": [
       "error",
@@ -32,7 +26,10 @@
     "max-len": [
       "error",
       {
-        "code": 80
+        "code": 80,
+        "ignoreUrls": true,
+        "ignoreStrings": true,
+        "ignoreTemplateLiterals": true
       }
     ],
     "no-duplicate-imports": "error",

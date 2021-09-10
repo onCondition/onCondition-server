@@ -1,7 +1,4 @@
-const createError = require("http-errors");
-
-const { ERROR } = require("../../constants/messages");
-const { BAD_REQUEST } = require("../../constants/statusCodes");
+const googleActivities = require("../../constants/googleActivities.json");
 
 function isValidUrl(string) {
   let url = null;
@@ -30,6 +27,14 @@ function isValidText(text) {
   return typeof text === "string";
 }
 
+function isValidDuration(duration) {
+  return typeof duration === "number" && duration > 0;
+}
+
+function isValidActivityType(type) {
+  return Object.values(googleActivities).includes(type);
+}
+
 function validateBody(entries) {
   const errors = [];
 
@@ -47,5 +52,7 @@ module.exports = {
   isValidDate,
   isValidHeartCount,
   isValidText,
+  isValidDuration,
   validateBody,
+  isValidActivityType,
 };

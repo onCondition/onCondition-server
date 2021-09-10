@@ -1,10 +1,9 @@
 const mongoose = require("mongoose");
 const mongoosePaginate = require("mongoose-paginate-v2");
-
-const { ERROR } = require("../constants/messages");
+const findOrCreate = require("mongoose-findorcreate");
 
 const stepSchema = new mongoose.Schema({
-  userId: {
+  creator: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     required: true,
@@ -21,5 +20,6 @@ const stepSchema = new mongoose.Schema({
 
 stepSchema.path("_id");
 stepSchema.plugin(mongoosePaginate);
+stepSchema.plugin(findOrCreate);
 
 module.exports = mongoose.model("Step", stepSchema);

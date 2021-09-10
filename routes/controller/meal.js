@@ -1,10 +1,14 @@
 const createError = require("http-errors");
 const mongoose = require("mongoose");
+const s3 = require("../../config/AWS");
 
-const getImageUrl = require("../utils/getImageUrl");
 const Meal = require("../../models/Meal");
+const Comment = require("../../models/Comment");
+const defaultOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
-const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
+const {
+  OK, BAD_REQUEST, NOT_FOUND,
+} = require("../../constants/statusCodes");
 
 const {
   validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate,
@@ -12,16 +16,17 @@ const {
 
 async function getMeal(req, res, next) {
   try {
-    const pagenateOptions = {
-      limit: 7,
-      sort: { date: -1 },
-    };
+    const pagenateOptions = { ...defaultOption };
 
-    if (req.page) {
-      pagenateOptions.page = req.page;
+    const { userId } = req;
+    const { page } = req.headers;
+
+    if (page) {
+      pagenateOptions.page = page;
     }
 
-    const result = await Meal.paginate({ userId: req.userId }, pagenateOptions);
+    const result = await Meal.paginate({ creator: userId }, pagenateOptions);
+
     res.status(OK);
     res.json({
       result: "ok",
@@ -51,20 +56,23 @@ async function postMeal(req, res, next) {
     }
 
     const newMeal = {
-      userId: req.userId,
-      url,
+      creator: req.userId,
       date,
       rating: { heartCount, text },
     };
 
-    await Meal.create(newMeal);
+    if (url) {
+      newMeal.url = url;
+    }
+
+    const data = await Meal.create(newMeal);
 
     res.status(OK);
-    res.json({ result: "ok" });
+    res.json({ result: "ok", data });
   } catch (err) {
-    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
+
       return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
@@ -81,7 +89,7 @@ async function getMealDetail(req, res, next) {
     }
 
     const mealData = await Meal.findById(mealId).populate({
-      path: "comment",
+      path: "comments",
       populate: {
         path: "creator",
         select: "profileUrl, name",
@@ -107,24 +115,36 @@ async function patchMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    validateBody(req.body);
-
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
 
-    const result = await Meal.findByIdAndUpdate(mealId, {
-      url, date, rating: { heartCount, text },
-    });
+    const invalidValues = validateBody([
+      [url, isValidUrl],
+      [heartCount, isValidHeartCount],
+      [text, isValidText],
+      [date, isValidDate],
+    ]);
 
-    if (!result) {
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
+    }
+
+    const data = await Meal.findOneAndUpdate(
+      { _id: mealId, creator: req.userId },
+      { date, rating: { heartCount, text } },
+      { new: true },
+    );
+
+    if (!data) {
       throw createError(NOT_FOUND);
     }
 
     res.status(OK);
-    res.json({ result: "ok" });
+    res.json({ result: "ok", data });
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       const errPaths = Object.keys(err.errors).join(", ");
+
       return next(createError(BAD_REQUEST, errPaths + ERROR.INVALID_VALUE));
     }
 
@@ -140,11 +160,24 @@ async function deleteMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const result = await Meal.findByIdAndRemove(mealId);
+    const meal = await Meal.findOne({
+      _id: mealId,
+      creator: req.userId,
+    });
 
-    if (!result) {
+    if (!meal) {
       throw createError(NOT_FOUND);
     }
+
+    const imageKey = meal.url.split("/album1/").pop();
+
+    await s3.deleteObject({
+      Bucket: process.env.BUCKET_NAME,
+      Key: `album1/${imageKey}`,
+    }).promise();
+
+    await meal.deleteOne();
+    await Comment.deleteMany({ ratingId: meal._id });
 
     res.status(OK);
     res.json({ result: "ok" });
