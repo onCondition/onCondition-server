@@ -203,12 +203,14 @@ async function deleteAlbumDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const imageKey = album.url.split("/album1/").pop();
+    if (album.url) {
+      const imageKey = album.url.split("/album1/").pop();
 
-    await s3.deleteObject({
-      Bucket: process.env.BUCKET_NAME,
-      Key: `album1/${imageKey}`,
-    }).promise();
+      await s3.deleteObject({
+        Bucket: process.env.BUCKET_NAME,
+        Key: `album1/${imageKey}`,
+      }).promise();
+    }
 
     await album.deleteOne();
     await Comment.deleteMany({ ratingId: album._id });

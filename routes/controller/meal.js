@@ -169,12 +169,14 @@ async function deleteMealDetail(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
-    const imageKey = meal.url.split("/album1/").pop();
+    if (meal.url) {
+      const imageKey = meal.url.split("/album1/").pop();
 
-    await s3.deleteObject({
-      Bucket: process.env.BUCKET_NAME,
-      Key: `album1/${imageKey}`,
-    }).promise();
+      await s3.deleteObject({
+        Bucket: process.env.BUCKET_NAME,
+        Key: `album1/${imageKey}`,
+      }).promise();
+    }
 
     await meal.deleteOne();
     await Comment.deleteMany({ ratingId: meal._id });
