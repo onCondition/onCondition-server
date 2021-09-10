@@ -4,7 +4,6 @@ const createError = require("http-errors");
 const firebase = require("../../config/firebase");
 
 const User = require("../../models/User");
-const Step = require("../../models/Step");
 const Activity = require("../../models/Activity");
 const Sleep = require("../../models/Sleep");
 const Meal = require("../../models/Meal");
@@ -59,82 +58,78 @@ function postRefresh(req, res, next) {
 }
 
 async function getCondition(req, res, next) {
-  const user = await User.findOne(req.params.id);
-  const creator = user._id;
-  const today = new Date();
-  const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
+  try {
+    const user = await User.findOne(req.params.id);
+    const creator = user._id;
+    const today = new Date();
+    const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
 
-  const dataPipeLine = [{
-    $match: {
-      creator,
-      date: {
-        $gte: pastAMonthAgo,
-        $lte: pastMidnight,
+    const dataPipeLine = [{
+      $match: {
+        creator,
+        date: {
+          $gte: pastAMonthAgo,
+          $lte: pastMidnight,
+        },
       },
-    },
-  }, { $group: {
-    _id: {
-      $dateToString: {
-        format: "%Y-%m-%d",
-        date: "$date",
-      },
-    },
-    average: {
-      $avg: "$rating.heartCount",
-    },
-  } }, {
-    $sort: {
-      _id: -1,
-    },
-  },
-  ];
-
-  const customDataPipeLine = [{
-    $match: {
-      creator,
-      date: {
-        $gte: pastAMonthAgo,
-        $lte: pastMidnight,
-      },
-    },
-  } ,{ $group: {
-    _id: {
-      category: "$category",
-      date: {
+    }, { $group: {
+      _id: {
         $dateToString: {
           format: "%Y-%m-%d",
           date: "$date",
         },
       },
-    },
-    score: {
-      $avg: "$rating.heartCount",
-    },
-  } }, {
-    $group: {
-      _id: "$_id.category",
-      data: {
-        $push: {
-          _id: "$_id.date",
-          average: "$score",
-        },
+      average: {
+        $avg: "$rating.heartCount",
+      },
+    } }, {
+      $sort: {
+        _id: -1,
       },
     },
-  }];
+    ];
 
-  try {
-    const step = await Step.findOne({ userId: creator,
-      date: pastMidnight });
+    const customDataPipeLine = [{
+      $match: {
+        creator,
+        date: {
+          $gte: pastAMonthAgo,
+          $lte: pastMidnight,
+        },
+      },
+    } ,{ $group: {
+      _id: {
+        category: "$category",
+        date: {
+          $dateToString: {
+            format: "%Y-%m-%d",
+            date: "$date",
+          },
+        },
+      },
+      score: {
+        $avg: "$rating.heartCount",
+      },
+    } }, {
+      $group: {
+        _id: "$_id.category",
+        data: {
+          $push: {
+            _id: "$_id.date",
+            average: "$score",
+          },
+        },
+      },
+    }];
+
     const activityData = await Activity.aggregate(dataPipeLine).exec();
     const mealData = await Meal.aggregate(dataPipeLine).exec();
     const sleepData = await Sleep.aggregate(dataPipeLine).exec();
     const albumData = await Album.aggregate(customDataPipeLine).exec();
     const gridData = await Grid.aggregate(customDataPipeLine).exec();
-    const stepData = (!step) ? 0 : step.count;
 
     res.status(OK);
     res.json({
-      stepData,
       activityData,
       mealData,
       sleepData,
