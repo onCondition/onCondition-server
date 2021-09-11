@@ -16,6 +16,7 @@ const ERROR = {
   INVALID_ACTIVITY_TYPE: "유효하지 않은 액티비티 타입입니다",
   INVALID_FRIEND_ID: "유효하지 않은 친구ID입니다",
   ALREADY_NOT_FRIEND: "이미 친구가 아닙니다",
+  INVALID_SLEEP_DATA: "유효하지 않은 수면 정보입니다",
 };
 
 module.exports = { ERROR };

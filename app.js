@@ -12,6 +12,7 @@ const setAccessLevel = require("./routes/middleware/setAccessLevel");
 const login = require("./routes/api/login");
 const index = require("./routes/api/index");
 const meal = require("./routes/api/meal");
+const sleep = require("./routes/api/sleep");
 const activity = require("./routes/api/activity");
 const customGrid = require("./routes/api/customGrid");
 const customAlbum = require("./routes/api/customAlbum");
