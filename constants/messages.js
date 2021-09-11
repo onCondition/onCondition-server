@@ -14,6 +14,8 @@ const ERROR = {
   INVALID_VALUE: "은(는) 유효하지 않은 값입니다",
   GOOGLE_API_NOT_AVAILABLE: "현재 구글 데이터 이용이 불가능합니다.",
   INVALID_ACTIVITY_TYPE: "유효하지 않은 액티비티 타입입니다",
+  INVALID_FRIEND_ID: "유효하지 않은 친구ID입니다",
+  ALREADY_NOT_FRIEND: "이미 친구가 아닙니다",
 };
 
 module.exports = { ERROR };

@@ -17,6 +17,7 @@ const customGrid = require("./routes/api/customGrid");
 const customAlbum = require("./routes/api/customAlbum");
 const comment = require("./routes/api/comment");
 const preference = require("./routes/api/preference");
+const friend = require("./routes/api/friend");
 const image = require("./routes/api/image");
 const googleFit = require("./routes/api/googleFit");
 
@@ -32,6 +33,7 @@ app.use(/.*\/customGrid/, customGrid);
 app.use(/.*\/customAlbum/, customAlbum);
 app.use(/.*\/comments/, comment);
 app.use(/.*\/preference/, preference);
+app.use(/.*\/friends/, friend);
 app.use(/.*\/googleFit/, googleFit);
 app.use(/.*\/image/, image);
 
