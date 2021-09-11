@@ -1,14 +1,13 @@
 const express = require("express");
 const router = express.Router();
 const activityController = require("../controller/activity");
-const requiresLogin = require("../middleware/requiresLogin");
 
-router.get("/", requiresLogin, activityController.getActivity);
+router.get("/", activityController.getActivity);
 
 router.get("/:id", activityController.getActivityDetail);
 
-router.patch("/:id", requiresLogin, activityController.patchActivityDetail);
+router.patch("/:id", activityController.patchActivityDetail);
 
-router.delete("/:id", requiresLogin, activityController.deleteActivityDetail);
+router.delete("/:id", activityController.deleteActivityDetail);
 
 module.exports = router;

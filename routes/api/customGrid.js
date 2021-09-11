@@ -1,16 +1,16 @@
 const express = require("express");
 const router = express.Router();
 const gridController = require("../controller/customGrid");
-const requiresLogin = require("../middleware/requiresLogin");
+const requiresLogin = require("../middleware/setAccessLeve;");
 
-router.get("/:category", requiresLogin, gridController.getGrid);
+router.get("/:category", gridController.getGrid);
 
-router.post("/:category", requiresLogin, gridController.postGrid);
+router.post("/:category", gridController.postGrid);
 
 router.get("/:categoty/:id", gridController.getGridDetail);
 
-router.patch("/:category/:id", requiresLogin, gridController.patchGridDetail);
+router.patch("/:category/:id", gridController.patchGridDetail);
 
-router.delete("/:category/:id", requiresLogin, gridController.deleteGridDetail);
+router.delete("/:category/:id", gridController.deleteGridDetail);
 
 module.exports = router;

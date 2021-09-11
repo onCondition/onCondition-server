@@ -6,9 +6,11 @@ const Album = require("../../models/CustomAlbum");
 const User = require("../../models/User");
 const Comment = require("../../models/Comment");
 const defaultOption = require("../../config/paginateOption");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
-const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
-
+const {
+  OK, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED,
+} = require("../../constants/statusCodes");
 const {
   validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate,
 } = require("../utils/validations");
@@ -55,6 +57,10 @@ async function getAlbum(req, res, next) {
 
 async function postAlbum(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { userId } = req;
     const { category: categoryName } = req.params;
 
@@ -143,6 +149,10 @@ async function getAlbumDetail(req, res, next) {
 
 async function patchAlbumDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { userId } = req;
     const albumId = req.params.id;
 
@@ -188,6 +198,10 @@ async function patchAlbumDetail(req, res, next) {
 
 async function deleteAlbumDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const albumId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(albumId)) {

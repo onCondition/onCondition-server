@@ -1,15 +1,19 @@
 const createError = require("http-errors");
 const User = require("../../models/User");
-const CustomGrid = require("../../models/CustomGrid");
-const CustomAlbum = require("../../models/CustomAlbum");
 const Comment = require("../../models/Comment");
-const { ERROR } = require("../../constants/messages");
-const { BAD_REQUEST } = require("../../constants/statusCodes");
 const NUMBERS = require("../../constants/numbers");
-const { OK, CREATED } = require("../../constants/statusCodes");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
+const { ERROR } = require("../../constants/messages");
+const {
+  OK, CREATED, BAD_REQUEST, UNAUTHORIZED,
+} = require("../../constants/statusCodes");
 
 async function deleteCategory(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { category } = req.body;
     const user = await User.findById(req.userId);
     const categoryNames = user.customCategories;
@@ -37,6 +41,10 @@ async function deleteCategory(req, res, next) {
 
 async function addCategory(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { category, categoryType } = req.body;
     const user = await User.findById(req.userId);
     const categoryNames = user.customCategories;

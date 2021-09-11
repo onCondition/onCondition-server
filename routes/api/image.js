@@ -1,10 +1,20 @@
 const express = require("express");
 const router = express.Router();
+const createError = require("http-errors");
 const multer = require("multer");
 const multerS3 = require("multer-s3");
 
 const s3 = require("../../config/AWS");
-const requiresLogin = require("../middleware/requiresLogin");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
+const { UNAUTHORIZED } = require("../../constants/statusCodes");
+
+function checkAccessRange(req, res, next) {
+  if (!req.accesslevel !== (ACCESS_LEVELS.CREATOR)) {
+    return next(createError(UNAUTHORIZED));
+  }
+
+  next();
+}
 
 const upload = multer({
   storage: multerS3({
@@ -21,7 +31,7 @@ const upload = multer({
 
 router.post(
   "/",
-  requiresLogin,
+  checkAccessRange,
   upload.single("image"),
   function (req, res, next) {
     res.json({ result: "ok", imageUrl: req.file.location });
