@@ -8,7 +8,7 @@ const { handleNotFound, handleDefaultError } = require("./errorHandler");
 const app = express();
 
 const setCreator = require("./routes/middleware/setCreator");
-const setAccessLevel = require("./routes/middleware/setAccessLeve;");
+const setAccessLevel = require("./routes/middleware/setAccessLevel");
 const login = require("./routes/api/login");
 const index = require("./routes/api/index");
 const meal = require("./routes/api/meal");

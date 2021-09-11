@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const gridController = require("../controller/customGrid");
-const requiresLogin = require("../middleware/setAccessLeve;");
 
 router.get("/:category", gridController.getGrid);
 

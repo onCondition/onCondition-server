@@ -9,7 +9,7 @@ const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { UNAUTHORIZED } = require("../../constants/statusCodes");
 
 function checkAccessRange(req, res, next) {
-  if (!req.accesslevel !== (ACCESS_LEVELS.CREATOR)) {
+  if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
     return next(createError(UNAUTHORIZED));
   }
 
