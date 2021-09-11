@@ -7,15 +7,15 @@ const { handleNotFound, handleDefaultError } = require("./errorHandler");
 
 const app = express();
 
+const index = require("./routes/api/index");
 const meal = require("./routes/api/meal");
 const sleep = require("./routes/api/sleep");
 const image = require("./routes/api/image");
-const index = require("./routes/api/index");
 const comment = require("./routes/api/comment");
 const activity = require("./routes/api/activity");
 const googleFit = require("./routes/api/googleFit");
-const customGrid = require("./routes/api/customGrid");
 const preference = require("./routes/api/preference");
+const customGrid = require("./routes/api/customGrid");
 const customAlbum = require("./routes/api/customAlbum");
 
 app.use(logger("dev"));
