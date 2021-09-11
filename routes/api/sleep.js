@@ -1,9 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const sleepController = require("../controller/sleep");
-const requiresLogin = require("../middleware/requiresLogin");
 
-router.get("/", requiresLogin, sleepController.getSleep);
+router.get("/", sleepController.getSleep);
 
 router.get("/:id", sleepController.getSleepDetail);
 

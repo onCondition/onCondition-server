@@ -5,8 +5,11 @@ const Activity = require("../../models/Activity");
 const Step = require("../../models/Step");
 const Comment = require("../../models/Comment");
 const defaultOption = require("../../config/paginateOption");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
-const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
+const {
+  OK, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED,
+} = require("../../constants/statusCodes");
 
 const {
   validateBody, isValidHeartCount, isValidText,
@@ -59,7 +62,7 @@ async function getActivityDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", data: activityData });
+    res.json({ result: "ok", accessLevel: req.accessLevel, data: activityData });
   } catch (err) {
     next(err);
   }
@@ -67,6 +70,10 @@ async function getActivityDetail(req, res, next) {
 
 async function patchActivityDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const activityId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(activityId)) {
@@ -105,6 +112,10 @@ async function patchActivityDetail(req, res, next) {
 
 async function deleteActivityDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const activityId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(activityId)) {

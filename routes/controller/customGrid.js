@@ -4,8 +4,11 @@ const mongoose = require("mongoose");
 const Grid = require("../../models/CustomGrid");
 const User = require("../../models/User");
 const Comment = require("../../models/Comment");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
-const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
+const {
+  OK, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED,
+} = require("../../constants/statusCodes");
 
 const {
   validateBody, isValidHeartCount, isValidText, isValidDate,
@@ -67,6 +70,10 @@ async function getGrid(req, res, next) {
 
 async function postGrid(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { userId } = req;
     const { category: categoryName } = req.params;
 
@@ -142,7 +149,7 @@ async function getGridDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", data: gridData });
+    res.json({ result: "ok", accessLevel: req.accessLevel, data: gridData });
   } catch (err) {
     next(err);
   }
@@ -150,6 +157,10 @@ async function getGridDetail(req, res, next) {
 
 async function patchGridDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { userId } = req;
     const gridId = req.params.id;
 
@@ -195,6 +206,10 @@ async function patchGridDetail(req, res, next) {
 
 async function deleteGridDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { userId } = req;
     const gridId = req.params.id;
 
