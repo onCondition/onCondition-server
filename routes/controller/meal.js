@@ -7,8 +7,9 @@ const Comment = require("../../models/Comment");
 const defaultOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
 const {
-  OK, BAD_REQUEST, NOT_FOUND,
+  OK, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED,
 } = require("../../constants/statusCodes");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
 
 const {
   validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate,
@@ -16,6 +17,10 @@ const {
 
 async function getMeal(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const pagenateOptions = { ...defaultOption };
 
     const { userId } = req;
@@ -41,6 +46,10 @@ async function getMeal(req, res, next) {
 
 async function postMeal(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
 
@@ -101,7 +110,7 @@ async function getMealDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", data: mealData });
+    res.json({ result: "ok", accessLevel: req.accessLevel, data: mealData });
   } catch (err) {
     next(err);
   }
@@ -109,6 +118,10 @@ async function getMealDetail(req, res, next) {
 
 async function patchMealDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const mealId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(mealId)) {
@@ -154,6 +167,10 @@ async function patchMealDetail(req, res, next) {
 
 async function deleteMealDetail(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
+
     const mealId = req.params.id;
 
     if (!mongoose.Types.ObjectId.isValid(mealId)) {
