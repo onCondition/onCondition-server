@@ -137,7 +137,7 @@ async function getProfile(req, res, next) {
 
     const data = recentDataPerModel.reduce((data, dataPerModel) => {
       return data.concat(dataPerModel);
-    }, []);
+    }, []).sort((a, b) => b.date - a.date);
 
     res.status(OK);
     res.json({
