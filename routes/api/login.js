@@ -19,11 +19,14 @@ router.post("/login", async function postLogin(req, res, next) {
       uid, name, profileUrl,
     });
 
+    const { _id: id, customCategories } = user;
     const accessToken = generateToken(user._id);
     const refreshToken = generateToken(user._id, true);
 
     res.status(OK);
     res.json({
+      id,
+      customCategories,
       accessToken,
       refreshToken,
     });
