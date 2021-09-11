@@ -80,16 +80,20 @@ async function getGoogleFitStepData(accessToken) {
 async function updateModels({ sleeps, activities, steps }, userId) {
   try {
     const activitiesPromises = activities.map(
-      (activity) => Activity.findOrCreate(({ userId, ...activity })),
+      (activity) => Activity.findOrCreate(({ creator: userId, ...activity })),
     );
     const sleepsPromises = sleeps.map(
-      (sleep) => Sleep.findOrCreate(({ userId, ...sleep })),
+      (sleep) => Sleep.findOrCreate(({ creator: userId, ...sleep })),
     );
     const { date, count } = steps.pop();
 
     await Promise.all(sleepsPromises);
     await Promise.all(activitiesPromises);
-    await Step.findOneAndUpdate({ userId }, { date, count }, { upsert: true });
+    await Step.findOneAndUpdate(
+      { creator: userId },
+      { date, count },
+      { upsert: true },
+    );
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       throw createError(BAD_REQUEST, ERROR.INVALID_VALUE);
