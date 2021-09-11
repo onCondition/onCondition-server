@@ -31,10 +31,12 @@ async function getActivity(req, res, next) {
     res.status(OK);
     res.json({
       result: "ok",
-      activities: result.docs,
+      data: {
+        activities: result.docs,
+        stepCount: stepData?.count || 0,
+      },
       nextPage: result.nextPage,
       prevPage: result.prevPage,
-      stepCount: stepData?.count || 0,
     });
   } catch (err) {
     next(err);
