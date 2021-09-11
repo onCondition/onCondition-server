@@ -5,7 +5,7 @@ const requiresLogin = require("../middleware/requiresLogin");
 
 router.get("/", requiresLogin, sleepController.getSleep);
 
-router.get("/:id", requiresLogin, sleepController.getSleepDetail);
+router.get("/:id", sleepController.getSleepDetail);
 
 router.patch("/:id", requiresLogin, sleepController.patchSleepDetail);
 
