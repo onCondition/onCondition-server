@@ -1,5 +1,3 @@
-const mongoose = require("mongoose");
-
 const createError = require("http-errors");
 const firebase = require("../../config/firebase");
 
@@ -14,10 +12,6 @@ const getPastISOTime = require("../utils/getPastISOTime");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST } = require("../../constants/statusCodes");
 const { generateToken, verifyToken } = require("../utils/tokens");
-
-const {
-  validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate,
-} = require("../utils/validations");
 
 async function postLogin(req, res, next) {
   const { token: idToken } = req.headers;
@@ -63,63 +57,74 @@ async function getCondition(req, res, next) {
     const today = new Date();
     const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
 
-    const dataPipeLine = [{
-      $match: {
-        creator,
-        date: {
-          $gte: pastAMonthAgo,
-          $lte: pastMidnight,
+    const dataPipeLine = [
+      {
+        $match: {
+          creator,
+          date: {
+            $gte: pastAMonthAgo,
+            $lte: pastMidnight,
+          },
         },
       },
-    }, { $group: {
-      _id: {
-        $dateToString: {
-          format: "%Y-%m-%d",
-          date: "$date",
+      {
+        $group: {
+          _id: {
+            $dateToString: {
+              format: "%Y-%m-%d",
+              date: "$date",
+            },
+          },
+          average: {
+            $avg: "$rating.heartCount",
+          },
         },
       },
-      average: {
-        $avg: "$rating.heartCount",
+      {
+        $sort: {
+          _id: -1,
+        },
       },
-    } }, {
-      $sort: {
-        _id: -1,
-      },
-    },
     ];
 
-    const customDataPipeLine = [{
-      $match: {
-        creator,
-        date: {
-          $gte: pastAMonthAgo,
-          $lte: pastMidnight,
-        },
-      },
-    } ,{ $group: {
-      _id: {
-        category: "$category",
-        date: {
-          $dateToString: {
-            format: "%Y-%m-%d",
-            date: "$date",
+    const customDataPipeLine = [
+      {
+        $match: {
+          creator,
+          date: {
+            $gte: pastAMonthAgo,
+            $lte: pastMidnight,
           },
         },
       },
-      score: {
-        $avg: "$rating.heartCount",
-      },
-    } }, {
-      $group: {
-        _id: "$_id.category",
-        data: {
-          $push: {
-            _id: "$_id.date",
-            average: "$score",
+      {
+        $group: {
+          _id: {
+            category: "$category",
+            date: {
+              $dateToString: {
+                format: "%Y-%m-%d",
+                date: "$date",
+              },
+            },
+          },
+          score: {
+            $avg: "$rating.heartCount",
           },
         },
       },
-    }];
+      {
+        $group: {
+          _id: "$_id.category",
+          data: {
+            $push: {
+              _id: "$_id.date",
+              average: "$score",
+            },
+          },
+        },
+      },
+    ];
 
     const activityData = await Activity.aggregate(dataPipeLine).exec();
     const mealData = await Meal.aggregate(dataPipeLine).exec();
