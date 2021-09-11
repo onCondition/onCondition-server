@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const createError = require("http-errors");
 const firebase = require("../../config/firebase");
 
@@ -53,7 +54,7 @@ function postRefresh(req, res, next) {
 
 async function getCondition(req, res, next) {
   try {
-    const creator = req.userId;
+    const creator = mongoose.Types.ObjectId(req.userId);
     const today = new Date();
     const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
 
@@ -126,11 +127,11 @@ async function getCondition(req, res, next) {
       },
     ];
 
-    const activityData = await Activity.aggregate(dataPipeLine).exec();
-    const mealData = await Meal.aggregate(dataPipeLine).exec();
-    const sleepData = await Sleep.aggregate(dataPipeLine).exec();
-    const albumData = await Album.aggregate(customDataPipeLine).exec();
-    const gridData = await Grid.aggregate(customDataPipeLine).exec();
+    const activityData = await Activity.aggregate(dataPipeLine);
+    const mealData = await Meal.aggregate(dataPipeLine);
+    const sleepData = await Sleep.aggregate(dataPipeLine);
+    const albumData = await Album.aggregate(customDataPipeLine);
+    const gridData = await Grid.aggregate(customDataPipeLine);
 
     res.status(OK);
     res.json({
