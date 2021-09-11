@@ -58,7 +58,7 @@ async function getSleepDetail(req, res, next) {
       path: "comments",
       populate: {
         path: "creator",
-        select: "profileUrl, name",
+        select: "profileUrl, name, uid",
       },
     });
 
@@ -125,7 +125,7 @@ async function deleteSleepDetail(req, res, next) {
       throw createError(NOT_FOUND, ERROR.SESSION_NOT_FOUND);
     }
 
-    const deletedDoc = await Comment.deleteOne({ ratingId: sleep._id });
+    const deletedDoc = await Comment.deleteMany({ ratingId: sleep._id });
 
     if (deletedDoc === "Not Found") {
       throw createError(NOT_FOUND, ERROR.INVALID_SLEEP_DATA);
