@@ -9,12 +9,15 @@ const Album = require("../../models/CustomAlbum");
 const Grid = require("../../models/CustomGrid");
 
 const getPastISOTime = require("../utils/getPastISOTime");
-const { ERROR } = require("../../constants/messages");
-const { OK, BAD_REQUEST } = require("../../constants/statusCodes");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
+const { OK, UNAUTHORIZED, NOT_FOUND } = require("../../constants/statusCodes");
 const { generateToken, verifyToken } = require("../utils/tokens");
 
 async function getCondition(req, res, next) {
   try {
+    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
+      throw createError(UNAUTHORIZED);
+    }
     const creator = mongoose.Types.ObjectId(req.userId);
     const today = new Date();
     const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
@@ -107,8 +110,45 @@ async function getCondition(req, res, next) {
   }
 }
 
-function getProfile(req, res, next) {
-  const { creator } = req;
+async function getProfile(req, res, next) {
+  try {
+    const creator = mongoose.Types.ObjectId(req.userId);
+    const user = await User.findById(creator);
+
+    if (!user) {
+      next(createError(NOT_FOUND));
+    }
+
+    const { stroke, scores, lastAccessDate } = user;
+    const now = new Date();
+    const { pastAMonthAgo } = getPastISOTime(now);
+
+    const matchOption = { creator, date: { $gte: pastAMonthAgo, $lte: now } };
+
+    const activity = Activity.aggregate([{ $match: matchOption }, { $addFields: { category: "activity" } }]);
+    const meal = Meal.aggregate([{ $match: matchOption }, { $addFields: { category: "meal" } }]);
+    const sleep = Sleep.aggregate([{ $match: matchOption }, { $addFields: { category: "sleep" } }]);
+    const album = Album.aggregate([{ $match: matchOption }, { $addFields: { type: "album" } }]);
+    const grid = Grid.aggregate([{ $match: matchOption }, { $addFields: { type: "grid" } }]);
+
+    const recentDataPerModel = await Promise.all([
+      activity, meal, sleep, album, grid,
+    ]);
+
+    const data = recentDataPerModel.reduce((data, dataPerModel) => {
+      return data.concat(dataPerModel);
+    }, []);
+
+    res.status(OK);
+    res.json({
+      stroke,
+      scores,
+      lastAccessDate,
+      data,
+    });
+  } catch (err) {
+    next(err);
+  }
 }
 
 function postRefresh(req, res, next) {
