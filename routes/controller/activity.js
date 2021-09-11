@@ -62,7 +62,7 @@ async function getActivityDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", data: activityData });
+    res.json({ result: "ok", accessLevel: req.accessLevel, data: activityData });
   } catch (err) {
     next(err);
   }

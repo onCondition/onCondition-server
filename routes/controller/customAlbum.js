@@ -141,7 +141,7 @@ async function getAlbumDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", data: albumData });
+    res.json({ result: "ok", accessLevel: req.accessLevel, data: albumData });
   } catch (err) {
     next(err);
   }
