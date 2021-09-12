@@ -8,7 +8,7 @@ const Grid = require("../../models/CustomGrid");
 const Meal = require("../../models/Meal");
 const Sleep = require("../../models/Sleep");
 
-const { capitalize } = require("../utils");
+const { capitalize } = require("../utils/capitalize");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const {
   OK, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED,
