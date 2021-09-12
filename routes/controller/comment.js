@@ -8,6 +8,7 @@ const Grid = require("../../models/CustomGrid");
 const Meal = require("../../models/Meal");
 const Sleep = require("../../models/Sleep");
 
+const { capitalize } = require("../utils");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const {
   OK, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED,
@@ -43,7 +44,7 @@ function getCategoryType(categoryName, customCategories) {
     return null;
   }
 
-  return categoryInfo.category;
+  return categoryInfo.categoryType;
 }
 
 async function postComment(req, res, next) {
@@ -51,7 +52,8 @@ async function postComment(req, res, next) {
   const { category, ratingId } = req.params;
   const { date, content } = req.body;
   const categoryType = getCategoryType(category, creator.customCategories);
-  const modelName = categoryModelName[categoryType];
+  const modelName = capitalize(categoryType);
+  const categoryNameInDb = categoryModelName[categoryType];
 
   try {
     if (req.accessLevel === ACCESS_LEVELS.GUEST) {
@@ -67,7 +69,7 @@ async function postComment(req, res, next) {
     }
 
     const newComment = await Comment.create({
-      category: modelName,
+      category: categoryNameInDb,
       ratingId,
       creator: userId,
       date,
@@ -75,8 +77,12 @@ async function postComment(req, res, next) {
     });
 
     const commentId = newComment._id;
-    await RatingModels[modelName].findByIdAndUpdate(ratingId,
-      { $push: { comments: [commentId] } });
+    const updated = await RatingModels[modelName].findByIdAndUpdate(ratingId,
+      { $push: { comments: commentId } }).lean();
+
+    if (!updated) {
+      throw createError(NOT_FOUND);
+    }
 
     res.status(OK);
     res.json({ result: "ok" });
@@ -85,12 +91,87 @@ async function postComment(req, res, next) {
   }
 }
 
-function patchComment() {
-  //
+async function patchComment(req, res, next) {
+  const { creator, userId } = req;
+  const { category, ratingId, id } = req.params;
+  const { date, content } = req.body;
+  const categoryType = getCategoryType(category, creator.customCategories);
+
+  try {
+    if (req.accessLevel === ACCESS_LEVELS.GUEST) {
+      throw createError(UNAUTHORIZED);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ratingId)) {
+      throw createError(NOT_FOUND);
+    }
+
+    if (!categoryType) {
+      throw createError(BAD_REQUEST, ERROR.COMMENT_NOT_EXIST);
+    }
+
+    const comment = await Comment.findById(id);
+
+    if (!comment) {
+      throw createError(NOT_FOUND, ERROR.COMMENT_NOT_EXIST);
+    }
+
+    if (comment.creator.toString() !== userId) {
+      throw createError(UNAUTHORIZED);
+    }
+
+    await comment.updateOne({ $set: { date, content } });
+
+    res.status(OK);
+    res.json({ result: "ok" });
+  } catch (err) {
+    next(err);
+  }
 }
 
-function deleteComment() {
-  //
+async function deleteComment(req, res, next) {
+  const { creator, userId } = req;
+  const { category, ratingId, id } = req.params;
+  const categoryType = getCategoryType(category, creator.customCategories);
+  const modelName = capitalize(categoryType);
+
+  try {
+    if (req.accessLevel === ACCESS_LEVELS.GUEST) {
+      throw createError(UNAUTHORIZED);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(ratingId)) {
+      throw createError(NOT_FOUND);
+    }
+
+    if (!categoryType) {
+      throw createError(BAD_REQUEST, ERROR.CATEGORY_NOT_FOUND);
+    }
+
+    const comment = await Comment.findById(id);
+
+    if (!comment) {
+      throw createError(NOT_FOUND, ERROR.COMMENT_NOT_EXIST);
+    }
+
+    if (comment.creator.toString() !== userId && creator.id !== userId ) {
+      throw createError(UNAUTHORIZED);
+    }
+
+    await comment.deleteOne();
+
+    const updated = await RatingModels[modelName].findByIdAndUpdate(ratingId,
+      { $pull: { comments: id } }).lean();
+
+    if (!updated) {
+      throw createError(NOT_FOUND, ERROR.COMMENT_NOT_EXIST);
+    }
+
+    res.status(OK);
+    res.json({ result: "ok" });
+  } catch (err) {
+    next(err);
+  }
 }
 
 module.exports = { postComment, patchComment, deleteComment };
