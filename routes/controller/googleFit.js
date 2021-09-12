@@ -22,10 +22,9 @@ async function postGoogleToken(req, res, next) {
     }
 
     const { activities, sleeps } = await getGoogleFitSessionData(accessToken);
-    let steps = null;
 
     try {
-      steps = await getGoogleFitStepData(accessToken);
+      const steps = await getGoogleFitStepData(accessToken);
 
       await updateModels({ activities, sleeps, steps }, req.creator);
 
