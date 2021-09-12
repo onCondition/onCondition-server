@@ -17,6 +17,7 @@ const ERROR = {
   INVALID_FRIEND_ID: "유효하지 않은 친구ID입니다",
   ALREADY_NOT_FRIEND: "이미 친구가 아닙니다",
   INVALID_SLEEP_DATA: "유효하지 않은 수면 정보입니다",
+  STEP_DATA_NOT_AVAILABLE: "걸음수 정보를 확인할 수 없습니다",
 };
 
 module.exports = { ERROR };
