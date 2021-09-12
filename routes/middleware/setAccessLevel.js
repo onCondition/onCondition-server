@@ -1,38 +1,26 @@
-const mongoose = require("mongoose");
-
-const User = require("../../models/User");
-const { verifyToken } = require("../utils/tokens");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 
-async function setAccessLevel(req, res, next) {
-  const { token: accessToken } = req.headers;
-  const { creator } = req;
+function setAccessLevel(req, res, next) {
+  const { userId, creator } = req;
 
-  if (!accessToken) {
+  if (!userId) {
     req.accessLevel = ACCESS_LEVELS.GUEST;
 
     return next();
   }
 
   try {
-    const { userId } = verifyToken(accessToken);
-    req.userId = userId;
-
     if (!creator) {
       return next();
     }
 
-    if (userId === creator) {
+    if (userId === creator.id) {
       req.accessLevel = ACCESS_LEVELS.CREATOR;
 
       return next();
     }
 
-    const isFriend = await User.findOne({
-      _id: creator, friends: { $all: [mongoose.Types.ObjectId(userId)] },
-    });
-
-    if (isFriend) {
+    if (creator.friends.includes(userId)) {
       req.accessLevel = ACCESS_LEVELS.FRIEND;
     } else {
       req.accessLevel = ACCESS_LEVELS.GUEST;

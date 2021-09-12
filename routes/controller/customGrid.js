@@ -2,7 +2,6 @@ const createError = require("http-errors");
 const mongoose = require("mongoose");
 
 const Grid = require("../../models/CustomGrid");
-const User = require("../../models/User");
 const Comment = require("../../models/Comment");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
@@ -16,22 +15,14 @@ const {
 const CustomGrid = require("../../models/CustomGrid");
 
 async function getGrid(req, res, next) {
+  if (req.categoryType !== "grid") {
+    return next();
+  }
+
   const contentPerPage = 30;
-
   try {
-    const { userId } = req;
-    const { category: categoryName } = req.params;
+    const { userId, category: categoryName } = req;
     const { page } = req.headers;
-
-    const user = await User.findById(userId);
-    const categories = user.customCategories;
-
-    if (
-      !categories.length
-      || !categories.find(({ category }) => category === categoryName)
-    ) {
-      throw createError(BAD_REQUEST, ERROR.CATEGORY_NOT_FOUND);
-    }
 
     const pagenateOptions = {
       limit: contentPerPage,
@@ -69,6 +60,10 @@ async function getGrid(req, res, next) {
 }
 
 async function postGrid(req, res, next) {
+  if (req.categoryType !== "grid") {
+    return next();
+  }
+
   try {
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
       throw createError(UNAUTHORIZED);
@@ -76,16 +71,6 @@ async function postGrid(req, res, next) {
 
     const { userId } = req;
     const { category: categoryName } = req.params;
-
-    const user = await User.findById(userId);
-    const categories = user.customCategories;
-
-    if (
-      !categories.length
-      || !categories.find(({ category }) => category === categoryName)
-    ) {
-      throw createError(BAD_REQUEST, ERROR.CATEGORY_NOT_FOUND);
-    }
 
     const { heartCount, text } = req.body;
     const date = new Date(req.body.date);
@@ -123,6 +108,10 @@ async function postGrid(req, res, next) {
 }
 
 async function getGridDetail(req, res, next) {
+  if (req.categoryType !== "grid") {
+    return next();
+  }
+
   try {
     const gridId = req.params.id;
 
@@ -149,13 +138,19 @@ async function getGridDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", accessLevel: req.accessLevel, data: gridData });
+    res.json({
+      result: "ok", accessLevel: req.accessLevel, category: "Grid", data: gridData,
+    });
   } catch (err) {
     next(err);
   }
 }
 
 async function patchGridDetail(req, res, next) {
+  if (req.categoryType !== "grid") {
+    return next();
+  }
+
   try {
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
       throw createError(UNAUTHORIZED);
@@ -205,6 +200,10 @@ async function patchGridDetail(req, res, next) {
 }
 
 async function deleteGridDetail(req, res, next) {
+  if (req.categoryType !== "grid") {
+    return next();
+  }
+
   try {
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
       throw createError(UNAUTHORIZED);

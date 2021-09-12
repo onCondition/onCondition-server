@@ -18,6 +18,7 @@ const ERROR = {
   ALREADY_NOT_FRIEND: "이미 친구가 아닙니다",
   INVALID_SLEEP_DATA: "유효하지 않은 수면 정보입니다",
   STEP_DATA_NOT_AVAILABLE: "걸음수 정보를 확인할 수 없습니다",
+  INVALID_PATH: "유효하지 않은 요청 경로입니다",
 };
 
 module.exports = { ERROR };

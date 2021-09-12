@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 const s3 = require("../../config/AWS");
 
 const Album = require("../../models/CustomAlbum");
-const User = require("../../models/User");
 const Comment = require("../../models/Comment");
 const defaultOption = require("../../config/paginateOption");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
@@ -17,19 +16,8 @@ const {
 
 async function getAlbum(req, res, next) {
   try {
-    const { userId } = req;
-    const { category: categoryName } = req.params;
+    const { userId, category: categoryName } = req;
     const { page } = req.headers;
-
-    const user = await User.findById(userId);
-    const categories = user.customCategories;
-
-    if (
-      !categories.length
-      || !categories.find(({ category }) => category === categoryName)
-    ) {
-      throw createError(BAD_REQUEST, ERROR.CATEGORY_NOT_FOUND);
-    }
 
     const pagenateOptions = {
       ...defaultOption,
@@ -63,17 +51,6 @@ async function postAlbum(req, res, next) {
 
     const { userId } = req;
     const { category: categoryName } = req.params;
-
-    const user = await User.findById(userId);
-    const categories = user.customCategories;
-
-    if (
-      !categories.length
-      || !categories.find(({ category }) => category === categoryName)
-    ) {
-      throw createError(BAD_REQUEST, ERROR.CATEGORY_NOT_FOUND);
-    }
-
     const { url, heartCount, text } = req.body;
     const date = new Date(req.body.date);
 
