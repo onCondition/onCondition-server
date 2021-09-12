@@ -104,7 +104,6 @@ async function updateModels({ sleeps, activities, steps }, userId) {
       );
     }
   } catch (err) {
-    console.log(err);
     if (err instanceof mongoose.Error.ValidationError) {
       throw createError(BAD_REQUEST, ERROR.INVALID_VALUE);
     }
