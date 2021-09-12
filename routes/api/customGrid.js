@@ -2,14 +2,14 @@ const express = require("express");
 const router = express.Router();
 const gridController = require("../controller/customGrid");
 
-router.get("/:category", gridController.getGrid);
+router.get("/", gridController.getGrid);
 
-router.post("/:category", gridController.postGrid);
+router.post("/", gridController.postGrid);
 
-router.get("/:categoty/:id", gridController.getGridDetail);
+router.get("/:id", gridController.getGridDetail);
 
-router.patch("/:category/:id", gridController.patchGridDetail);
+router.patch("/:id", gridController.patchGridDetail);
 
-router.delete("/:category/:id", gridController.deleteGridDetail);
+router.delete("/:id", gridController.deleteGridDetail);
 
 module.exports = router;
