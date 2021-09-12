@@ -13,6 +13,7 @@ const { ERROR } = require("../../constants/messages");
 const {
   BAD_REQUEST,
   UNAUTHORIZED,
+  FORBIDDEN,
   INTERNAL_SERVER_ERROR,
 } = require("../../constants/statusCodes");
 const { ONE_DAY_IN_MS } = require("../../constants/times");
@@ -65,6 +66,10 @@ async function getGoogleFitStepData(accessToken) {
 
     return count;
   } catch (err) {
+    if (err.response.status === FORBIDDEN) {
+      throw createError(FORBIDDEN, ERROR.STEP_DATA_NOT_AVAILABLE);
+    }
+
     if (!axios.isAxiosError(err)) {
       throw createError(INTERNAL_SERVER_ERROR);
     }
@@ -85,15 +90,19 @@ async function updateModels({ sleeps, activities, steps }, userId) {
     const sleepsPromises = sleeps.map(
       (sleep) => Sleep.findOrCreate(({ creator: userId, ...sleep })),
     );
-    const { date, count } = steps.pop();
 
     await Promise.all(sleepsPromises);
     await Promise.all(activitiesPromises);
-    await Step.findOneAndUpdate(
-      { creator: userId },
-      { date, count },
-      { upsert: true },
-    );
+
+    if (steps) {
+      const { date, count } = steps.pop();
+
+      await Step.findOneAndUpdate(
+        { creator: userId },
+        { date, count },
+        { upsert: true },
+      );
+    }
   } catch (err) {
     if (err instanceof mongoose.Error.ValidationError) {
       throw createError(BAD_REQUEST, ERROR.INVALID_VALUE);
