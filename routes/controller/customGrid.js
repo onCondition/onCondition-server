@@ -139,7 +139,7 @@ async function getGridDetail(req, res, next) {
 
     res.status(OK);
     res.json({
-      result: "ok", accessLevel: req.accessLevel, category: "Grid", data: gridData,
+      result: "ok", accessLevel: req.accessLevel, data: gridData,
     });
   } catch (err) {
     next(err);

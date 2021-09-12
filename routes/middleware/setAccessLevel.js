@@ -1,3 +1,4 @@
+const mongoose = require("mongoose");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 
 function setAccessLevel(req, res, next) {
@@ -20,7 +21,7 @@ function setAccessLevel(req, res, next) {
       return next();
     }
 
-    if (creator.friends.includes(userId)) {
+    if (creator.friends.includes(mongoose.Types.ObjectId(userId))) {
       req.accessLevel = ACCESS_LEVELS.FRIEND;
     } else {
       req.accessLevel = ACCESS_LEVELS.GUEST;
