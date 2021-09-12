@@ -14,15 +14,15 @@ async function setCreator(req, res, next) {
       next(createError(NOT_FOUND, ERROR.INVALID_PATH));
     }
 
-    const {
-      _id: id, friends, customCategories,
-    } = await User.findById(creatorId);
+    const creator = await User.findById(creatorId);
 
-    if (!id) {
+    if (!creator) {
       next(createError(NOT_FOUND, ERROR.INVALID_PATH));
     }
 
-    req.creator = { id, friends, customCategories };
+    const { friends, customCategories } = creator;
+
+    req.creator = { id: creatorId, friends, customCategories };
 
     next();
   } catch (err) {
