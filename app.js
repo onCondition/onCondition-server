@@ -8,8 +8,9 @@ const { handleNotFound, handleDefaultError } = require("./errorHandler");
 const app = express();
 
 const setUserId = require("./routes/middleware/setUserId");
-const setRequestInfo = require("./routes/middleware/setRequestInfo");
+const setCreator = require("./routes/middleware/setCreator");
 const setAccessLevel = require("./routes/middleware/setAccessLevel");
+const setCategory = require("./routes/middleware/setCategory");
 const verifyCustomCategory = require("./routes/middleware/verifyCustomCategory");
 const login = require("./routes/api/login");
 const index = require("./routes/api/index");
@@ -29,8 +30,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", login);
-app.use("/:creatorId/", setUserId, index);
-app.use("/:creatorId/:category", setRequestInfo, setAccessLevel);
+app.use("/:creatorId/", setUserId, setCreator, setAccessLevel, index);
+app.use("/:creatorId/:category", setCategory);
 app.use(/.*\/meal/, meal);
 app.use(/.*\/activity/, activity);
 app.use(/.*\/sleep/, sleep);

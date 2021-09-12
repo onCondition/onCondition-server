@@ -6,8 +6,8 @@ const User = require("../../models/User");
 const { NOT_FOUND } = require("../../constants/statusCodes");
 const { ERROR } = require("../../constants/messages");
 
-async function setRequestInfo(req, res, next) {
-  const { creatorId, category } = req.params;
+async function setCreator(req, res, next) {
+  const { creatorId } = req.params;
 
   try {
     if (!mongoose.Types.ObjectId.isValid(creatorId)) {
@@ -23,7 +23,6 @@ async function setRequestInfo(req, res, next) {
     }
 
     req.creator = { id, friends, customCategories };
-    req.category = category;
 
     next();
   } catch (err) {
@@ -31,4 +30,4 @@ async function setRequestInfo(req, res, next) {
   }
 }
 
-module.exports = setRequestInfo;
+module.exports = setCreator;
