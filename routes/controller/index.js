@@ -99,7 +99,7 @@ async function getCondition(req, res, next) {
       ...customScores,
     };
 
-    await User.findByIdAndUpdate(creator, { scores: [scores] });
+    await User.findByIdAndUpdate(creator, { scores });
 
     const data = {
       activity: activityData || [],
