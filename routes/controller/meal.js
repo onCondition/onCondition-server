@@ -17,10 +17,6 @@ const {
 
 async function getMeal(req, res, next) {
   try {
-    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
-      throw createError(UNAUTHORIZED);
-    }
-
     const pagenateOptions = { ...defaultOption };
 
     const { userId } = req;
