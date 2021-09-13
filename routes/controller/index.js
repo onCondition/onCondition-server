@@ -42,13 +42,6 @@ async function getCondition(req, res, next) {
         data: { $push: "$$ROOT" },
       },
     };
-    const defaulDataPipeLine = [
-      setDateRange,
-      groupByDate,
-      sortByDate,
-      caculateTotalAverage,
-    ];
-
     const groupByDateAndCategory = {
       $group: {
         _id: {
@@ -67,6 +60,12 @@ async function getCondition(req, res, next) {
       },
     };
 
+    const defaultDataPipeLine = [
+      setDateRange,
+      groupByDate,
+      sortByDate,
+      caculateTotalAverage,
+    ];
     const customDataPipeLine = [
       groupByDateAndCategory,
       sortByDateBeforePush,
@@ -74,9 +73,9 @@ async function getCondition(req, res, next) {
     ];
 
     const [activity, meal, sleep, album, grid] = await Promise.all([
-      Activity.aggregate(defaulDataPipeLine),
-      Meal.aggregate(defaulDataPipeLine),
-      Sleep.aggregate(defaulDataPipeLine),
+      Activity.aggregate(defaultDataPipeLine),
+      Meal.aggregate(defaultDataPipeLine),
+      Sleep.aggregate(defaultDataPipeLine),
       Album.aggregate(customDataPipeLine),
       Grid.aggregate(customDataPipeLine),
     ]);
