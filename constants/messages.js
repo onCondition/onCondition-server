@@ -16,6 +16,8 @@ const ERROR = {
   INVALID_ACTIVITY_TYPE: "유효하지 않은 액티비티 타입입니다",
   INVALID_FRIEND_ID: "유효하지 않은 친구ID입니다",
   ALREADY_NOT_FRIEND: "이미 친구가 아닙니다",
+  INVALID_FRIEND_REQUEST: "유효하지 않은 친구요청입니다.",
+  UNCLEAR_FINISHED_ADD_FRIEND: "친구 추가 과정이 비정상적으로 종료되었습니다.",
   INVALID_SLEEP_DATA: "유효하지 않은 수면 정보입니다",
   STEP_DATA_NOT_AVAILABLE: "걸음수 정보를 확인할 수 없습니다",
 };
