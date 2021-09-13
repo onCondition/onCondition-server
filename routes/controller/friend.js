@@ -12,10 +12,6 @@ const {
 
 async function getFriends(req, res, next) {
   try {
-    if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
-      throw createError(UNAUTHORIZED);
-    }
-
     const { creator } = mongoose.Types.ObjectId(req.creator.id);
     const { page } = req.headers;
 
