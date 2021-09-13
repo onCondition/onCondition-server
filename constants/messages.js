@@ -19,8 +19,9 @@ const ERROR = {
   INVALID_FRIEND_REQUEST: "유효하지 않은 친구요청입니다.",
   UNCLEAR_FINISHED_ADD_FRIEND: "친구 추가 과정이 비정상적으로 종료되었습니다.",
   INVALID_SLEEP_DATA: "유효하지 않은 수면 정보입니다",
-  INVALID_PATH: "유효하지 않은 요청 경로입니다",
   STEP_DATA_NOT_AVAILABLE: "걸음수 정보를 확인할 수 없습니다",
+  INVALID_PATH: "유효하지 않은 요청 경로입니다",
+  COMMENT_NOT_EXIST: "존재하지 않는 코멘트입니다",
 };
 
 module.exports = { ERROR };

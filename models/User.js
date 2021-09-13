@@ -22,7 +22,7 @@ const userSchema = new mongoose.Schema({
     type: Number,
   },
   scores: {
-    type: Array,
+    type: Object,
   },
   friends: [{
     type: mongoose.Schema.Types.ObjectId,
