@@ -109,7 +109,7 @@ async function getCondition(req, res, next) {
     };
 
     res.status(OK);
-    res.json({ result: "ok", data });
+    res.json({ result: "ok", data, status: scores });
   } catch (err) {
     next(err);
   }
