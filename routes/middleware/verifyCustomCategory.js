@@ -3,7 +3,8 @@ const { NOT_FOUND } = require("../../constants/statusCodes");
 const { ERROR } = require("../../constants/messages");
 
 function verifyCustomCategory(req, res, next) {
-  const { creator, category: categoryName } = req;
+  const { category: categoryName } = req.params;
+  const { creator } = req;
 
   const categoryInfo = creator.customCategories.find(
     ({ category }) => category === categoryName,
