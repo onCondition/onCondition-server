@@ -7,10 +7,7 @@ const { handleNotFound, handleDefaultError } = require("./errorHandler");
 
 const app = express();
 
-const setUserId = require("./routes/middleware/setUserId");
-const setCreator = require("./routes/middleware/setCreator");
 const setAccessLevel = require("./routes/middleware/setAccessLevel");
-const setCategory = require("./routes/middleware/setCategory");
 const verifyCustomCategory = require("./routes/middleware/verifyCustomCategory");
 const login = require("./routes/api/login");
 const index = require("./routes/api/index");
@@ -30,16 +27,15 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 app.use("/", login);
-app.use("/:creatorId/", setUserId, setCreator, setAccessLevel, index);
-app.use("/:creatorId/:category", setCategory);
+app.use("/:creatorId/", setAccessLevel, index);
 app.use(/.*\/meal/, meal);
 app.use(/.*\/activity/, activity);
 app.use(/.*\/sleep/, sleep);
-app.use(/.*\/comment/, comment);
 app.use(/.*\/preference/, preference);
 app.use(/.*\/friends/, friend);
 app.use(/.*\/googleFit/, googleFit);
 app.use(/.*\/image/, image);
+app.use("/:creatorId/:category/:ratingId/comment", comment);
 app.use("/:creatorId/:category", verifyCustomCategory, customGrid, customAlbum);
 
 app.use(handleNotFound);
