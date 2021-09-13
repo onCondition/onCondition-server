@@ -21,7 +21,8 @@ async function getGrid(req, res, next) {
 
   const contentPerPage = 30;
   try {
-    const { userId, category: categoryName } = req;
+    const { userId } = req;
+    const { category: categoryName } = req.params;
     const { page } = req.headers;
 
     const pagenateOptions = {
@@ -47,6 +48,7 @@ async function getGrid(req, res, next) {
       { creator: userId, category: categoryName }, pagenateOptions,
     );
 
+    console.log(userId, categoryName);
     res.status(OK);
     res.json({
       result: "ok",
