@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 
 const User = require("../../models/User");
 const Request = require("../../models/Request");
-const defaultOption = require("../../config/paginateOption");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
 const {
@@ -13,23 +12,8 @@ const {
 async function getFriends(req, res, next) {
   try {
     const { creator } = mongoose.Types.ObjectId(req.creator.id);
-    const { page } = req.headers;
-
-    const paginateOptions = {
-      sort: { lastAccessDate: -1 },
-      limit: 8,
-      populate: "friends",
-      lean: true,
-    };
-
-    if (page) {
-      paginateOptions.page = page;
-    }
-
-    const result = await User.paginate({
-      _id: creator,
-    },
-    paginateOptions).exec();
+    const friends = await User.findById(creator).populate("friends",
+      "_id name profileUrl stroke scores lastAccessDate").exec();
 
     const receivedRequests = await Request.find({
       receiverId: creator,
@@ -42,9 +26,7 @@ async function getFriends(req, res, next) {
     res.status(OK);
     res.json({
       result: "ok",
-      data: result.docs,
-      nextPage: result.nextPage,
-      prevPage: result.prevPage,
+      friends,
       receivedRequests,
       sentRequests,
     });
