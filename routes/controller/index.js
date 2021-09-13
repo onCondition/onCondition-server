@@ -119,7 +119,9 @@ async function getProfile(req, res, next) {
       next(createError(NOT_FOUND));
     }
 
-    const { stroke, scores, lastAccessDate } = user;
+    const {
+      stroke, scores, lastAccessDate, profileUrl, name,
+    } = user;
     const now = new Date();
     const { pastAMonthAgo } = getPastISOTime(now);
 
@@ -144,6 +146,8 @@ async function getProfile(req, res, next) {
       stroke,
       scores,
       lastAccessDate,
+      profileUrl,
+      name,
       data,
     });
   } catch (err) {
