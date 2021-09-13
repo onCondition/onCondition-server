@@ -8,6 +8,9 @@ const Grid = require("../../models/CustomGrid");
 const Meal = require("../../models/Meal");
 const Sleep = require("../../models/Sleep");
 
+const {
+  validateBody, isValidText, isValidDate,
+} = require("../utils/validations");
 const { capitalize } = require("../utils/capitalize");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const {
@@ -50,7 +53,8 @@ function getCategoryType(categoryName, customCategories) {
 async function postComment(req, res, next) {
   const { creator, userId } = req;
   const { category, ratingId } = req.params;
-  const { date, content } = req.body;
+  const { content } = req.body;
+  const date = new Date(req.body.date);
   const categoryType = getCategoryType(category, creator.customCategories);
   const modelName = capitalize(categoryType);
   const categoryNameInDb = categoryModelName[categoryType];
@@ -66,6 +70,15 @@ async function postComment(req, res, next) {
 
     if (!categoryType) {
       throw createError(BAD_REQUEST, ERROR.CATEGORY_NOT_FOUND);
+    }
+
+    const invalidValues = validateBody([
+      [content, isValidText],
+      [date, isValidDate],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
 
     const newComment = await Comment.create({
@@ -94,7 +107,8 @@ async function postComment(req, res, next) {
 async function patchComment(req, res, next) {
   const { creator, userId } = req;
   const { category, ratingId, id } = req.params;
-  const { date, content } = req.body;
+  const { content } = req.body;
+  const date = new Date(req.body.date);
   const categoryType = getCategoryType(category, creator.customCategories);
 
   try {
@@ -106,8 +120,21 @@ async function patchComment(req, res, next) {
       throw createError(NOT_FOUND);
     }
 
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      throw createError(NOT_FOUND);
+    }
+
     if (!categoryType) {
       throw createError(BAD_REQUEST, ERROR.COMMENT_NOT_EXIST);
+    }
+
+    const invalidValues = validateBody([
+      [content, isValidText],
+      [date, isValidDate],
+    ]);
+
+    if (invalidValues.length) {
+      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
 
     const comment = await Comment.findById(id);
@@ -141,6 +168,10 @@ async function deleteComment(req, res, next) {
     }
 
     if (!mongoose.Types.ObjectId.isValid(ratingId)) {
+      throw createError(NOT_FOUND);
+    }
+
+    if (!mongoose.Types.ObjectId.isValid(id)) {
       throw createError(NOT_FOUND);
     }
 
