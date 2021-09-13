@@ -67,7 +67,7 @@ async function getSleepDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", sleep });
+    res.json({ result: "ok", accessLevel: req.accessLevel, sleep });
   } catch (err) {
     next(err);
   }
