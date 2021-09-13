@@ -23,7 +23,7 @@ async function setAccessLevel(req, res, next) {
     }
 
     const { friends, customCategories } = creator;
-    req.creator = { id: creatorId, customCategories };
+    req.creator = { id: creatorId, customCategories, friends };
 
     if (!accessToken) {
       req.accessLevel = ACCESS_LEVELS.GUEST;
