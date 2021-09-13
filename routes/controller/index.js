@@ -22,89 +22,93 @@ async function getCondition(req, res, next) {
     const today = new Date();
     const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
 
-    const dataPipeLine = [
-      {
-        $match: {
-          creator,
-          date: {
-            $gte: pastAMonthAgo,
-            $lte: pastMidnight,
-          },
-        },
+    const setDateRange = {
+      $match: {
+        creator,
+        date: { $gte: pastAMonthAgo, $lte: pastMidnight },
       },
-      {
-        $group: {
-          _id: {
-            $dateToString: {
-              format: "%Y-%m-%d",
-              date: "$date",
-            },
-          },
-          average: {
-            $avg: "$rating.heartCount",
-          },
-        },
+    };
+    const groupByDate = {
+      $group: {
+        _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        average: { $avg: "$rating.heartCount" },
       },
-      {
-        $sort: {
-          _id: -1,
-        },
+    };
+    const sortByDate = { $sort: { _id: -1 } };
+    const caculateTotalAverage = {
+      $group: {
+        _id: null,
+        average: { $avg: "$average" },
+        data: { $push: "$$ROOT" },
       },
-    ];
+    };
+    const groupByDateAndCategory = {
+      $group: {
+        _id: {
+          category: "$category",
+          date: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+        },
+        score: { $avg: "$rating.heartCount" },
+      },
+    };
+    const sortByDateBeforePush = { $sort: { "_id.date": -1 } };
+    const groupByCategory = {
+      $group: {
+        _id: "$_id.category",
+        average: { $avg: "$score" },
+        data: { $push: { _id: "$_id.date", average: "$score" } },
+      },
+    };
 
+    const defaultDataPipeLine = [
+      setDateRange,
+      groupByDate,
+      sortByDate,
+      caculateTotalAverage,
+    ];
     const customDataPipeLine = [
-      {
-        $match: {
-          creator,
-          date: {
-            $gte: pastAMonthAgo,
-            $lte: pastMidnight,
-          },
-        },
-      },
-      {
-        $group: {
-          _id: {
-            category: "$category",
-            date: {
-              $dateToString: {
-                format: "%Y-%m-%d",
-                date: "$date",
-              },
-            },
-          },
-          score: {
-            $avg: "$rating.heartCount",
-          },
-        },
-      },
-      {
-        $group: {
-          _id: "$_id.category",
-          data: {
-            $push: {
-              _id: "$_id.date",
-              average: "$score",
-            },
-          },
-        },
-      },
+      groupByDateAndCategory,
+      sortByDateBeforePush,
+      groupByCategory,
     ];
 
-    const activityData = await Activity.aggregate(dataPipeLine);
-    const mealData = await Meal.aggregate(dataPipeLine);
-    const sleepData = await Sleep.aggregate(dataPipeLine);
-    const albumData = await Album.aggregate(customDataPipeLine);
-    const gridData = await Grid.aggregate(customDataPipeLine);
+    const [activity, meal, sleep, album, grid] = await Promise.all([
+      Activity.aggregate(defaultDataPipeLine),
+      Meal.aggregate(defaultDataPipeLine),
+      Sleep.aggregate(defaultDataPipeLine),
+      Album.aggregate(customDataPipeLine),
+      Grid.aggregate(customDataPipeLine),
+    ]);
+
+    const { average: activityScore, data: activityData } = activity[0] || {};
+    const { average: mealScore, data: mealData } = meal[0] || {};
+    const { average: sleepScore, data: sleepData } = sleep[0] || {};
+    const { averages: customScores, datas: customDatas } = [...album, ...grid]
+      .reduce(({ averages, datas }, { _id: category, average, data }) => {
+        return {
+          averages: { ...averages, [category]: average },
+          datas: { ...datas, [category]: data },
+        };
+      }, { averages: {}, datas: {} }) || {};
+
+    const scores = {
+      activity: activityScore || 0,
+      meal: mealScore || 0,
+      sleep: sleepScore || 0,
+      ...customScores,
+    };
+
+    await User.findByIdAndUpdate(creator, { scores });
+
+    const data = {
+      activity: activityData || [],
+      meal: mealData || [],
+      sleep: sleepData || [],
+      ...customDatas,
+    };
 
     res.status(OK);
-    res.json({
-      activityData,
-      mealData,
-      sleepData,
-      albumData,
-      gridData,
-    });
+    res.json({ result: "ok", data, status: scores });
   } catch (err) {
     next(err);
   }
