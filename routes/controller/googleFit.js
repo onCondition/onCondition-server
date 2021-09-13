@@ -26,13 +26,13 @@ async function postGoogleToken(req, res, next) {
     try {
       const steps = await getGoogleFitStepData(accessToken);
 
-      await updateModels({ activities, sleeps, steps }, req.creator);
+      await updateModels({ activities, sleeps, steps }, req.creator.id);
 
       res.status(OK);
       res.json({ result: "ok" });
     } catch (err) {
       if (err.message === ERROR.STEP_DATA_NOT_AVAILABLE) {
-        await updateModels({ activities, sleeps }, req.creator);
+        await updateModels({ activities, sleeps }, req.creator.id);
 
         res.status(OK);
         res.json({ result: "No Step Data" });

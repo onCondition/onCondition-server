@@ -49,7 +49,10 @@ async function getProfile(req, res, next) {
     const now = new Date();
     const { pastAMonthAgo } = getPastISOTime(now);
 
-    const matchOption = { friendId, date: { $gte: pastAMonthAgo, $lte: now } };
+    const matchOption = {
+      creator: friendId,
+      date: { $gte: pastAMonthAgo, $lte: now },
+    };
 
     const activity = Activity.aggregate([{ $match: matchOption }, { $addFields: { category: "activity" } }]);
     const meal = Meal.aggregate([{ $match: matchOption }, { $addFields: { category: "meal" } }]);
