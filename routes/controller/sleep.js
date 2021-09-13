@@ -58,7 +58,7 @@ async function getSleepDetail(req, res, next) {
       path: "comments",
       populate: {
         path: "creator",
-        select: "profileUrl, name, uid",
+        select: "profileUrl name",
       },
     });
 

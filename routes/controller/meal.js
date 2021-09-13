@@ -97,7 +97,7 @@ async function getMealDetail(req, res, next) {
       path: "comments",
       populate: {
         path: "creator",
-        select: "profileUrl, name",
+        select: "profileUrl name",
       },
     });
 
