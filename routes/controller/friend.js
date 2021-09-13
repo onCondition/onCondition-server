@@ -11,8 +11,6 @@ const {
 } = require("../../constants/statusCodes");
 
 async function getFriends(req, res, next) {
-  const contentPerPage = 8;
-
   try {
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
       throw createError(UNAUTHORIZED);
@@ -121,7 +119,7 @@ async function patchFriendDetail(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_FRIEND_REQUEST);
     }
 
-    if (isAccepted === "true") {
+    if (isAccepted) {
       const receiverResult = User.findByIdAndUpdate(creator, {
         $push: { friends: mongoose.Types.ObjectId(friendId) },
       });
