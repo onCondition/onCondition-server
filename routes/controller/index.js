@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 const createError = require("http-errors");
 
-const User = require("../../models/User");
 const Activity = require("../../models/Activity");
 const Sleep = require("../../models/Sleep");
 const Meal = require("../../models/Meal");
@@ -10,7 +9,7 @@ const Grid = require("../../models/CustomGrid");
 
 const getPastISOTime = require("../utils/getPastISOTime");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
-const { OK, UNAUTHORIZED, NOT_FOUND } = require("../../constants/statusCodes");
+const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");
 const { generateToken, verifyToken } = require("../utils/tokens");
 
 async function getCondition(req, res, next) {
@@ -110,51 +109,6 @@ async function getCondition(req, res, next) {
   }
 }
 
-async function getProfile(req, res, next) {
-  try {
-    const creator = mongoose.Types.ObjectId(req.userId);
-    const user = await User.findById(creator);
-
-    if (!user) {
-      next(createError(NOT_FOUND));
-    }
-
-    const {
-      stroke, scores, lastAccessDate, profileUrl, name,
-    } = user;
-    const now = new Date();
-    const { pastAMonthAgo } = getPastISOTime(now);
-
-    const matchOption = { creator, date: { $gte: pastAMonthAgo, $lte: now } };
-
-    const activity = Activity.aggregate([{ $match: matchOption }, { $addFields: { category: "activity" } }]);
-    const meal = Meal.aggregate([{ $match: matchOption }, { $addFields: { category: "meal" } }]);
-    const sleep = Sleep.aggregate([{ $match: matchOption }, { $addFields: { category: "sleep" } }]);
-    const album = Album.aggregate([{ $match: matchOption }, { $addFields: { type: "album" } }]);
-    const grid = Grid.aggregate([{ $match: matchOption }, { $addFields: { type: "grid" } }]);
-
-    const recentDataPerModel = await Promise.all([
-      activity, meal, sleep, album, grid,
-    ]);
-
-    const data = recentDataPerModel.reduce((data, dataPerModel) => {
-      return data.concat(dataPerModel);
-    }, []).sort((a, b) => b.date - a.date);
-
-    res.status(OK);
-    res.json({
-      stroke,
-      scores,
-      lastAccessDate,
-      profileUrl,
-      name,
-      data,
-    });
-  } catch (err) {
-    next(err);
-  }
-}
-
 function postRefresh(req, res, next) {
   const { token: refreshToken } = req.headers;
 
@@ -169,4 +123,4 @@ function postRefresh(req, res, next) {
   }
 }
 
-module.exports = { getCondition, getProfile, postRefresh };
+module.exports = { getCondition, postRefresh };
