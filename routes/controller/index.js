@@ -1,6 +1,7 @@
 const mongoose = require("mongoose");
 const createError = require("http-errors");
 
+const User = require("../../models/User");
 const Activity = require("../../models/Activity");
 const Sleep = require("../../models/Sleep");
 const Meal = require("../../models/Meal");
