@@ -33,7 +33,7 @@ async function deleteFriendDetail(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_FRIEND_ID);
     }
 
-    const senderResult = await User.findByIdAndUpdate(creator, {
+    const senderResult = await User.findByIdAndUpdate(creator.id, {
       $pull: { friends: mongoose.Types.ObjectId(friendId) },
     });
 
@@ -42,7 +42,7 @@ async function deleteFriendDetail(req, res, next) {
     }
 
     const receiverResult = await User.findByIdAndUpdate(friendId, {
-      $pull: { friends: mongoose.Types.ObjectId(creator) },
+      $pull: { friends: mongoose.Types.ObjectId(creator.id) },
     });
 
     if (!receiverResult) {
