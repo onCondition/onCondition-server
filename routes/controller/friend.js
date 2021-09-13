@@ -16,7 +16,7 @@ async function getFriends(req, res, next) {
       throw createError(UNAUTHORIZED);
     }
 
-    const { creator } = mongoose.Types.ObjectId(req);
+    const { creator } = mongoose.Types.ObjectId(req.creator.id);
     const { page } = req.headers;
 
     const paginateOptions = {
@@ -59,7 +59,7 @@ async function getFriends(req, res, next) {
 
 async function sendFriendRequest(req, res, next) {
   try {
-    const { creator } = req;
+    const { creator } = req.creator.id;
     const { friendId } = req.body;
 
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
@@ -98,7 +98,7 @@ async function sendFriendRequest(req, res, next) {
 
 async function patchFriendDetail(req, res, next) {
   try {
-    const { creator } = req;
+    const { creator } = req.creator.id;
     const { id: friendId } = req.params;
     const { isAccepted } = req.body.isAccepted;
 
@@ -148,7 +148,7 @@ async function patchFriendDetail(req, res, next) {
 }
 
 async function deleteFriendDetail(req, res, next) {
-  const { creator } = req;
+  const { creator } = req.creator.id;
   const { id: friendId } = req.params;
 
   try {
