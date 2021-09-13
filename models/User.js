@@ -24,10 +24,9 @@ const userSchema = new mongoose.Schema({
   scores: {
     type: Object,
   },
-  friends: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-  }],
+  friends: {
+    type: Array,
+  },
   customCategories: {
     type: Array,
   },
