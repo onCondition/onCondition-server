@@ -16,7 +16,8 @@ const {
 
 async function getAlbum(req, res, next) {
   try {
-    const { userId, category: categoryName } = req;
+    const { userId } = req;
+    const { category: categoryName } = req.params;
     const { page } = req.headers;
 
     const pagenateOptions = {
