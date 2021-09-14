@@ -4,6 +4,4 @@ const indexController = require("../controller/index");
 
 router.get("/", indexController.getCondition);
 
-router.post("/refresh", indexController.postRefresh);
-
 module.exports = router;

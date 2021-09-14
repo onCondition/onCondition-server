@@ -114,18 +114,4 @@ async function getCondition(req, res, next) {
   }
 }
 
-function postRefresh(req, res, next) {
-  const { token: refreshToken } = req.headers;
-
-  try {
-    const { userId } = verifyToken(refreshToken, true);
-    const accessToken = generateToken(userId);
-
-    res.status(OK);
-    res.json({ accessToken });
-  } catch (err) {
-    next(err);
-  }
-}
-
-module.exports = { getCondition, postRefresh };
+module.exports = { getCondition };

@@ -8,6 +8,8 @@ const { ERROR } = require("../../constants/messages");
 const { UNAUTHORIZED } = require("../../constants/statusCodes");
 const { TokenExpiredError, JsonWebTokenError } = jwt;
 
+const BEARER = "Bearer ";
+
 function generateToken(userId, isRefreshToken = false) {
   const secret = isRefreshToken
     ? process.env.REFRESH_TOKEN_SECRET
@@ -42,4 +44,12 @@ function verifyToken(token, isRefreshToken = false) {
   }
 }
 
-module.exports = { generateToken, verifyToken };
+function parseBearer(authorization) {
+  if (authorization.startsWith(BEARER)) {
+    return authorization.slice(BEARER.length);
+  }
+
+  return null;
+}
+
+module.exports = { generateToken, verifyToken, parseBearer };

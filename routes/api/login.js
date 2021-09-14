@@ -6,12 +6,13 @@ const User = require("../../models/User");
 const firebase = require("../../config/firebase");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST } = require("../../constants/statusCodes");
-const { generateToken } = require("../utils/tokens");
+const { generateToken, verifyToken, parseBearer } = require("../helpers/tokens");
 
 router.post("/login", async function postLogin(req, res, next) {
-  const { token: idToken } = req.headers;
+  const { authorization } = req.headers;
 
   try {
+    const idToken = parseBearer(authorization);
     const {
       uid, name, picture: profileUrl,
     } = await firebase.auth().verifyIdToken(idToken);
@@ -32,6 +33,21 @@ router.post("/login", async function postLogin(req, res, next) {
     });
   } catch (err) {
     next(createError(BAD_REQUEST, ERROR.INVALID_TOKEN));
+  }
+});
+
+router.post("/refresh", function postRefresh(req, res, next) {
+  const { authorization } = req.headers;
+
+  try {
+    const refreshToken = parseBearer(authorization);
+    const { userId } = verifyToken(refreshToken, true);
+    const accessToken = generateToken(userId);
+
+    res.status(OK);
+    res.json({ accessToken });
+  } catch (err) {
+    next(err);
   }
 });
 
