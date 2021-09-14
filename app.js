@@ -3,7 +3,7 @@ require("./config/db");
 
 const express = require("express");
 const logger = require("morgan");
-const { handleNotFound, handleDefaultError } = require("./errorHandler");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -21,10 +21,12 @@ const preference = require("./routes/api/preference");
 const friend = require("./routes/api/friend");
 const image = require("./routes/api/image");
 const googleFit = require("./routes/api/googleFit");
+const { handleNotFound, handleDefaultError } = require("./errorHandler");
 
 app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser());
 
 app.use("/", login);
 app.use("/:creatorId/", setAccessLevel, index);
