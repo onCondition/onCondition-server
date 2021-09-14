@@ -6,13 +6,17 @@ const { verifyToken, parseBearer } = require("../helpers/tokens");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { NOT_FOUND } = require("../../constants/statusCodes");
 const { ERROR } = require("../../constants/messages");
+const getPastISOTime = require("../utils/getPastISOTime");
 
 async function setAccessLevel(req, res, next) {
   const { creatorId } = req.params;
   const { authorization } = req.headers;
-  const accessToken = parseBearer(authorization);
+  const today = new Date();
+  const { pastMidnight, pastTwoDayAgo } = getPastISOTime(today);
 
   try {
+    const accessToken = parseBearer(authorization);
+
     if (!mongoose.Types.ObjectId.isValid(creatorId)) {
       throw createError(NOT_FOUND, ERROR.INVALID_PATH);
     }
@@ -33,9 +37,33 @@ async function setAccessLevel(req, res, next) {
     }
 
     const { userId } = verifyToken(accessToken);
+    const upsertData = {
+      $set: {
+        lastAccessDate: today,
+      },
+      $inc: {
+        stroke: 1,
+      },
+    };
+
+    const resetData = {
+      $set: {
+        lastAccessDate: today,
+        stroke: 0,
+      },
+    };
+
     req.userId = userId;
 
     if (userId === creatorId) {
+      if (
+        creator.lastAccessDate > pastTwoDayAgo
+        && creator.lastAccessDate < pastMidnight
+      ) {
+        creator.update(upsertData, { upsert: true });
+      } else {
+        creator.update(resetData);
+      }
       req.accessLevel = ACCESS_LEVELS.CREATOR;
     } else if (friends.includes(mongoose.Types.ObjectId(userId))) {
       req.accessLevel = ACCESS_LEVELS.FRIEND;
