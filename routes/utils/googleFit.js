@@ -31,14 +31,14 @@ function parseSessionEntry({
     return null;
   }
 
-  const startTime = new Date(Number(startTimeMillis));
+  const date = new Date(Number(startTimeMillis));
 
-  if (!isValidDate(startTime)) {
+  if (!isValidDate(date)) {
     return null;
   }
 
   return {
-    sessionId, type, startTime, duration,
+    sessionId, type, date, duration,
   };
 }
 
