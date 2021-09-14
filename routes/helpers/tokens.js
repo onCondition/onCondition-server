@@ -2,7 +2,7 @@ const createError = require("http-errors");
 const jwt = require("jsonwebtoken");
 const {
   ISSUER, ACCESS_DURATION, REFRESH_DURATION,
-} = require("../../constants/tokenInfos");
+} = require("../../config/tokenInfos");
 const { ONE_SECOND_IN_MS } = require("../../constants/times");
 const { ERROR } = require("../../constants/messages");
 const { UNAUTHORIZED } = require("../../constants/statusCodes");

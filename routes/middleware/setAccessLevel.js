@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const createError = require("http-errors");
 
 const User = require("../../models/User");
-const { verifyToken, parseBearer } = require("../../helpers/tokens");
+const { verifyToken, parseBearer } = require("../helpers/tokens");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { NOT_FOUND } = require("../../constants/statusCodes");
 const { ERROR } = require("../../constants/messages");
