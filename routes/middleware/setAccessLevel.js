@@ -6,7 +6,7 @@ const { verifyToken } = require("../utils/tokens");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { NOT_FOUND } = require("../../constants/statusCodes");
 const { ERROR } = require("../../constants/messages");
-const getPastISOTime = require("../utils/getISOTime");
+const getISOTime = require("../utils/getISOTime");
 
 async function setAccessLevel(req, res, next) {
   const { creatorId } = req.params;
@@ -16,7 +16,7 @@ async function setAccessLevel(req, res, next) {
     todayMidnight,
     pastMidnight,
     pastTwoDayAgo,
-  } = getPastISOTime(nowTime);
+  } = getISOTime(nowTime);
 
   try {
     if (!mongoose.Types.ObjectId.isValid(creatorId)) {

@@ -8,7 +8,7 @@ const Meal = require("../../models/Meal");
 const Album = require("../../models/CustomAlbum");
 const Grid = require("../../models/CustomGrid");
 
-const getPastISOTime = require("../utils/getPastISOTime");
+const getISOTime = require("../utils/getISOTime");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");
 const { generateToken, verifyToken } = require("../utils/tokens");
@@ -20,7 +20,7 @@ async function getCondition(req, res, next) {
     }
     const creator = mongoose.Types.ObjectId(req.userId);
     const today = new Date();
-    const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
+    const { pastMidnight, pastAMonthAgo } = getISOTime(today);
 
     const setDateRange = {
       $match: {
