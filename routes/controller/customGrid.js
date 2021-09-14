@@ -30,7 +30,7 @@ async function getGrid(req, res, next) {
       sort: { date: 1 },
     };
 
-    if (page) {
+    if (page !== "last") {
       pagenateOptions.page = page;
     } else {
       const documentsCount = await CustomGrid.count(
@@ -48,7 +48,6 @@ async function getGrid(req, res, next) {
       { creator: userId, category: categoryName }, pagenateOptions,
     );
 
-    console.log(userId, categoryName);
     res.status(OK);
     res.json({
       result: "ok",
