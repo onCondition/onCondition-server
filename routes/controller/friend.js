@@ -57,7 +57,7 @@ async function getProfile(req, res, next) {
     const friendId = mongoose.Types.ObjectId(req.params.id);
 
     if (!creator.friends.includes(friendId)) {
-      throw createError(UNAUTHORIZED);
+      throw createError(NOT_FOUND);
     }
 
     const friend = await User.findById(friendId);

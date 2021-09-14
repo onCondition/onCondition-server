@@ -11,11 +11,11 @@ const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");
 
 async function postGoogleToken(req, res, next) {
   try {
+    const accessToken = req.cookies.googleAccessToken;
+
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
       throw createError(UNAUTHORIZED);
     }
-
-    const { accessToken } = req.body;
 
     if (!accessToken) {
       return next(createError(UNAUTHORIZED, ERROR.INVALID_TOKEN));
