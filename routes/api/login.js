@@ -15,13 +15,18 @@ router.post("/login", async function postLogin(req, res, next) {
     const {
       uid, name, picture: profileUrl,
     } = await firebase.auth().verifyIdToken(idToken);
-    const { doc: user } = await User.findOrCreate({
-      uid, name, profileUrl,
+    const userData = await User.findOrCreate({
+      uid,
+    }).update({
+      name,
+      profileUrl,
+    }, {
+      upsert: true,
     });
 
-    const { _id: userId, customCategories } = user;
-    const accessToken = generateToken(user._id);
-    const refreshToken = generateToken(user._id, true);
+    const { _id: userId, customCategories } = userData.user;
+    const accessToken = generateToken(userData.user._id);
+    const refreshToken = generateToken(userData.user._id, true);
 
     res.status(OK);
     res.json({

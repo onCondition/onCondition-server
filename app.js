@@ -3,7 +3,7 @@ require("./config/db");
 
 const express = require("express");
 const logger = require("morgan");
-const { handleNotFound, handleDefaultError } = require("./errorHandler");
+const cookieParser = require("cookie-parser");
 
 const app = express();
 
@@ -20,9 +20,11 @@ const comment = require("./routes/api/comment");
 const preference = require("./routes/api/preference");
 const friend = require("./routes/api/friend");
 const googleFit = require("./routes/api/googleFit");
+const { handleNotFound, handleDefaultError } = require("./errorHandler");
 
 app.use(logger("dev"));
 app.use(express.json());
+app.use(cookieParser());
 
 app.use("/", login);
 app.use("/:creatorId/", setAccessLevel, index);
@@ -30,7 +32,7 @@ app.use(/.*\/meal/, meal);
 app.use(/.*\/activity/, activity);
 app.use(/.*\/sleep/, sleep);
 app.use(/.*\/preference/, preference);
-app.use(/.*\/friends/, friend);
+app.use(/.*\/friend/, friend);
 app.use(/.*\/googleFit/, googleFit);
 app.use("/:creatorId/:category/:ratingId/comment", comment);
 app.use("/:creatorId/:category", verifyCustomCategory, customGrid, customAlbum);
