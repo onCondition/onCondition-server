@@ -11,6 +11,7 @@ const {
 } = require("../../constants/statusCodes");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 
+const getImageUrl = require("../services/getImageUrl");
 const {
   validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate,
 } = require("../utils/validations");
@@ -46,11 +47,10 @@ async function postMeal(req, res, next) {
       throw createError(UNAUTHORIZED);
     }
 
-    const { url, heartCount, text } = req.body;
+    const { image, heartCount, text } = req.body;
     const date = new Date(req.body.date);
 
     const invalidValues = validateBody([
-      [url, isValidUrl],
       [heartCount, isValidHeartCount],
       [text, isValidText],
       [date, isValidDate],
@@ -59,6 +59,8 @@ async function postMeal(req, res, next) {
     if (invalidValues.length) {
       throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
+
+    const url = await getImageUrl(image) || "";
 
     const newMeal = {
       creator: req.userId,
