@@ -1,10 +1,7 @@
 /* eslint-disable no-magic-numbers */
 const request = require("supertest");
 
-const {
-  dbConnect,
-  dbDisconnect,
-} = require("./db");
+const { dbConnect, dbDisconnect } = require("./db");
 const app = require("../app");
 
 const User = require("../models/User");
