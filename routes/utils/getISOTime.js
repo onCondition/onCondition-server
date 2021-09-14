@@ -1,7 +1,7 @@
 const NUMBERS = require("../../constants/numbers");
 const timeGap = 15;
 
-function getPastISOTime(today) {
+function getISOTime(today) {
   today.setUTCHours(
     timeGap, 0, 0, 0,
   );
@@ -24,4 +24,4 @@ function getPastISOTime(today) {
   };
 }
 
-module.exports = getPastISOTime;
+module.exports = getISOTime;
