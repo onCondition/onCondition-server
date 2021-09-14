@@ -3,6 +3,7 @@ const jwt = require("jsonwebtoken");
 const {
   ISSUER, ACCESS_DURATION, REFRESH_DURATION,
 } = require("../../constants/tokenInfos");
+const { ONE_SECOND_IN_MS } = require("../../constants/times");
 const { ERROR } = require("../../constants/messages");
 const { UNAUTHORIZED } = require("../../constants/statusCodes");
 const { TokenExpiredError, JsonWebTokenError } = jwt;
@@ -12,11 +13,11 @@ function generateToken(userId, isRefreshToken = false) {
     ? process.env.REFRESH_TOKEN_SECRET
     : process.env.ACCESS_TOKEN_SECRET;
   const duration = isRefreshToken ? REFRESH_DURATION : ACCESS_DURATION;
+  const nowInSecond = Math.floor(Date.now() / ONE_SECOND_IN_MS);
+  const exp = nowInSecond + duration;
+  const token = jwt.sign({ userId, exp }, secret, { issuer: ISSUER });
 
-  return jwt.sign({ userId }, secret, {
-    expiresIn: duration,
-    issuer: ISSUER,
-  });
+  return { token, exp };
 }
 
 function verifyToken(token, isRefreshToken = false) {
