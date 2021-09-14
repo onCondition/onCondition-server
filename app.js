@@ -32,7 +32,7 @@ app.use(/.*\/meal/, meal);
 app.use(/.*\/activity/, activity);
 app.use(/.*\/sleep/, sleep);
 app.use(/.*\/preference/, preference);
-app.use(/.*\/friends/, friend);
+app.use(/.*\/friend/, friend);
 app.use(/.*\/googleFit/, googleFit);
 app.use(/.*\/image/, image);
 app.use("/:creatorId/:category/:ratingId/comment", comment);
