@@ -67,6 +67,7 @@ async function getCondition(req, res, next) {
       caculateTotalAverage,
     ];
     const customDataPipeLine = [
+      setDateRange,
       groupByDateAndCategory,
       sortByDateBeforePush,
       groupByCategory,
