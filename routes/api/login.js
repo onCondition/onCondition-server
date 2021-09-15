@@ -7,7 +7,6 @@ const firebase = require("../../config/firebase");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST } = require("../../constants/statusCodes");
 const { generateToken } = require("../utils/tokens");
-const { findOneAndUpdate } = require("../../models/User");
 
 router.post("/login", async function postLogin(req, res, next) {
   const { token: idToken } = req.headers;
@@ -21,10 +20,12 @@ router.post("/login", async function postLogin(req, res, next) {
       uid,
     });
 
-    const result = user.update({
-      name,
-      profileUrl,
-    });
+    if (user.profileUrl !== profileUrl || user.name !== name) {
+      await user.update({
+        name,
+        profileUrl,
+      });
+    }
 
     const { _id: userId, customCategories } = user;
     const accessToken = generateToken(user._id);
@@ -38,7 +39,6 @@ router.post("/login", async function postLogin(req, res, next) {
       refreshToken,
     });
   } catch (err) {
-    console.log(err);
     next(createError(BAD_REQUEST, ERROR.INVALID_TOKEN));
   }
 });
