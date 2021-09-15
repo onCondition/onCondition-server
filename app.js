@@ -10,7 +10,7 @@ const app = express();
 const setAccessLevel = require("./routes/middleware/setAccessLevel");
 const verifyCustomCategory = require("./routes/middleware/verifyCustomCategory");
 const login = require("./routes/api/login");
-const index = require("./routes/api/index");
+const condition = require("./routes/api/condition");
 const meal = require("./routes/api/meal");
 const sleep = require("./routes/api/sleep");
 const activity = require("./routes/api/activity");
@@ -27,7 +27,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use("/", login);
-app.use("/:creatorId/", setAccessLevel, index);
+app.use("/:creatorId/", setAccessLevel, condition);
 app.use(/.*\/meal/, meal);
 app.use(/.*\/activity/, activity);
 app.use(/.*\/sleep/, sleep);
