@@ -60,16 +60,14 @@ async function postMeal(req, res, next) {
       throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
 
-    const url = await getImageUrl(image) || "";
-
     const newMeal = {
       creator: req.userId,
       date,
       rating: { heartCount, text },
     };
 
-    if (url) {
-      newMeal.url = url;
+    if (image) {
+      newMeal.url = await getImageUrl(image);
     }
 
     const data = await Meal.create(newMeal);

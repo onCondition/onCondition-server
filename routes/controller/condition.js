@@ -11,7 +11,6 @@ const Grid = require("../../models/CustomGrid");
 const getISOTime = require("../utils/getISOTime");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");
-const { generateToken, verifyToken } = require("../utils/tokens");
 
 async function getCondition(req, res, next) {
   try {
@@ -115,18 +114,4 @@ async function getCondition(req, res, next) {
   }
 }
 
-function postRefresh(req, res, next) {
-  const { token: refreshToken } = req.headers;
-
-  try {
-    const { userId } = verifyToken(refreshToken, true);
-    const accessToken = generateToken(userId);
-
-    res.status(OK);
-    res.json({ accessToken });
-  } catch (err) {
-    next(err);
-  }
-}
-
-module.exports = { getCondition, postRefresh };
+module.exports = { getCondition };

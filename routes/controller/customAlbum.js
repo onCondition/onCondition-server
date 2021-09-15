@@ -63,8 +63,6 @@ async function postAlbum(req, res, next) {
       [date, isValidDate],
     ]);
 
-    const url = await getImageUrl(image) || "";
-
     if (invalidValues.length) {
       throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
@@ -76,8 +74,8 @@ async function postAlbum(req, res, next) {
       category: categoryName,
     };
 
-    if (url) {
-      newAlbum.url = url;
+    if (image) {
+      newAlbum.url = await getImageUrl(image);
     }
 
     const data = await Album.create(newAlbum);

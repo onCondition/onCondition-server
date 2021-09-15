@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 const createError = require("http-errors");
 
 const User = require("../../models/User");
-const { verifyToken } = require("../utils/tokens");
+const { verifyToken, parseBearer } = require("../helpers/tokens");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { NOT_FOUND } = require("../../constants/statusCodes");
 const { ERROR } = require("../../constants/messages");
@@ -10,7 +10,7 @@ const getISOTime = require("../utils/getISOTime");
 
 async function setAccessLevel(req, res, next) {
   const { creatorId } = req.params;
-  const { token: accessToken } = req.headers;
+  const { authorization } = req.headers;
   const nowTime = new Date();
   const {
     todayMidnight,
@@ -19,6 +19,8 @@ async function setAccessLevel(req, res, next) {
   } = getISOTime(nowTime);
 
   try {
+    const accessToken = parseBearer(authorization);
+
     if (!mongoose.Types.ObjectId.isValid(creatorId)) {
       throw createError(NOT_FOUND, ERROR.INVALID_PATH);
     }
