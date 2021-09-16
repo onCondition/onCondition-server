@@ -231,6 +231,19 @@ describe("activity controller test", () => {
       expect(durations).toEqual([0]);
     });
 
+    test("it should not response sleep data when no data", async () => {
+      const res = await request(app)
+        .get(`/${mockUserId}/activity`)
+        .set("authorization", `Bearer ${mockToken}`)
+        .expect(OK)
+        .expect("Content-Type", /json/);
+
+      expect(res.body).toBeTruthy();
+      expect(res.body.result).toBe("ok");
+      expect(res.body.data).toBeTruthy();
+      expect(res.body.data.stepCount).toBe(0);
+    });
+
     test("it should response step data", async () => {
       await Step.create(mockStep);
 
