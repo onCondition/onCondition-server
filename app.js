@@ -4,13 +4,12 @@ require("./config/db");
 const express = require("express");
 const cors = require("cors");
 const logger = require("morgan");
-const cookieParser = require("cookie-parser");
 
 const app = express();
 
 const setAccessLevel = require("./routes/middleware/setAccessLevel");
 const verifyCustomCategory = require("./routes/middleware/verifyCustomCategory");
-const login = require("./routes/api/login");
+const auth = require("./routes/api/auth");
 const condition = require("./routes/api/condition");
 const meal = require("./routes/api/meal");
 const sleep = require("./routes/api/sleep");
@@ -31,9 +30,8 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(logger("dev"));
 app.use(express.json());
-app.use(cookieParser());
 
-app.use("/", login);
+app.use("/", auth);
 app.use("/:creatorId/", setAccessLevel, condition);
 app.use(/.*\/meal/, meal);
 app.use(/.*\/activity/, activity);
