@@ -14,7 +14,7 @@ async function deleteCategory(req, res, next) {
       throw createError(UNAUTHORIZED);
     }
 
-    const { category } = req.body;
+    const { category } = req.params;
     const user = await User.findById(req.userId);
     const categoryNames = user.customCategories;
 
@@ -26,14 +26,15 @@ async function deleteCategory(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_ALREADY_DELETED_CATEGORY);
     }
 
-    await User.findByIdAndUpdate(
-      req.userId, { $pull: { customCategories: { category } } },
+    const { customCategories } = await User.findByIdAndUpdate(req.userId,
+      { $pull: { customCategories: { category } } },
+      { new: true },
     );
 
     await Comment.deleteMany({ category });
 
     res.status(OK);
-    res.json({ result: "OK" });
+    res.json({ result: "OK", data: customCategories });
   } catch (err) {
     next(err);
   }
@@ -60,11 +61,13 @@ async function addCategory(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_OVERLAP_CATEGORY_NAME);
     }
 
-    const modifiedCategory = await User.updateOne({ _id: req.userId },
-      { $push: { customCategories: [{ category, categoryType }] } });
+    const { customCategories } = await User.findByIdAndUpdate(req.userId,
+      { $push: { customCategories: [{ category, categoryType }] } },
+      { new: true },
+    );
 
     res.status(CREATED);
-    res.json({ result: "OK", modifiedCategory });
+    res.json({ result: "OK", data: customCategories });
   } catch (err) {
     next(err);
   }

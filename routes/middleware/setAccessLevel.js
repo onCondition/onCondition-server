@@ -2,19 +2,25 @@ const mongoose = require("mongoose");
 const createError = require("http-errors");
 
 const User = require("../../models/User");
-const { verifyToken } = require("../utils/tokens");
+const { verifyToken, parseBearer } = require("../helpers/tokens");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { NOT_FOUND } = require("../../constants/statusCodes");
 const { ERROR } = require("../../constants/messages");
-const getPastISOTime = require("../utils/getPastISOTime");
+const getISOTime = require("../utils/getISOTime");
 
 async function setAccessLevel(req, res, next) {
   const { creatorId } = req.params;
-  const { token: accessToken } = req.headers;
-  const today = new Date();
-  const { pastMidnight, pastTwoDayAgo } = getPastISOTime(today);
+  const { authorization } = req.headers;
+  const nowTime = new Date();
+  const {
+    todayMidnight,
+    pastMidnight,
+    pastTwoDayAgo,
+  } = getISOTime(nowTime);
 
   try {
+    const accessToken = parseBearer(authorization);
+
     if (!mongoose.Types.ObjectId.isValid(creatorId)) {
       throw createError(NOT_FOUND, ERROR.INVALID_PATH);
     }
@@ -37,16 +43,22 @@ async function setAccessLevel(req, res, next) {
     const { userId } = verifyToken(accessToken);
     const upsertData = {
       $set: {
-        lastAccessDate: today,
+        lastAccessDate: nowTime,
       },
       $inc: {
         stroke: 1,
       },
     };
 
+    const updateDate = {
+      $set: {
+        lastAccessDate: nowTime,
+      },
+    };
+
     const resetData = {
       $set: {
-        lastAccessDate: today,
+        lastAccessDate: nowTime,
         stroke: 0,
       },
     };
@@ -59,9 +71,12 @@ async function setAccessLevel(req, res, next) {
         && creator.lastAccessDate < pastMidnight
       ) {
         creator.update(upsertData, { upsert: true });
+      } else if (todayMidnight < nowTime) {
+        creator.update(updateDate);
       } else {
         creator.update(resetData);
       }
+
       req.accessLevel = ACCESS_LEVELS.CREATOR;
     } else if (friends.includes(mongoose.Types.ObjectId(userId))) {
       req.accessLevel = ACCESS_LEVELS.FRIEND;

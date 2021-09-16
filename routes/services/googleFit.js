@@ -6,7 +6,7 @@ const Activity = require("../../models/Activity");
 const Sleep = require("../../models/Sleep");
 const Step = require("../../models/Step");
 
-const { parseSession, parseSteps } = require("../utils/googleFit");
+const { parseSession, parseSteps } = require("../helpers/googleFit");
 const { getDateMillis } = require("../utils/times");
 
 const { ERROR } = require("../../constants/messages");

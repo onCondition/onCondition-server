@@ -9,7 +9,7 @@ const Album = require("../../models/CustomAlbum");
 const Grid = require("../../models/CustomGrid");
 const Request = require("../../models/Request");
 
-const getPastISOTime = require("../utils/getPastISOTime");
+const getISOTime = require("../utils/getISOTime");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
 const {
@@ -57,7 +57,7 @@ async function getProfile(req, res, next) {
     const friendId = mongoose.Types.ObjectId(req.params.id);
 
     if (!creator.friends.includes(friendId)) {
-      throw createError(UNAUTHORIZED);
+      throw createError(NOT_FOUND);
     }
 
     const friend = await User.findById(friendId);
@@ -70,7 +70,7 @@ async function getProfile(req, res, next) {
       stroke, scores, lastAccessDate, profileUrl, name,
     } = friend;
     const now = new Date();
-    const { pastAMonthAgo } = getPastISOTime(now);
+    const { pastAMonthAgo } = getISOTime(now);
 
     const matchOption = {
       creator: friendId,

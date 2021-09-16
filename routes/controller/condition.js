@@ -8,10 +8,9 @@ const Meal = require("../../models/Meal");
 const Album = require("../../models/CustomAlbum");
 const Grid = require("../../models/CustomGrid");
 
-const getPastISOTime = require("../utils/getPastISOTime");
+const getISOTime = require("../utils/getISOTime");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");
-const { generateToken, verifyToken } = require("../utils/tokens");
 
 async function getCondition(req, res, next) {
   try {
@@ -20,7 +19,7 @@ async function getCondition(req, res, next) {
     }
     const creator = mongoose.Types.ObjectId(req.userId);
     const today = new Date();
-    const { pastMidnight, pastAMonthAgo } = getPastISOTime(today);
+    const { pastMidnight, pastAMonthAgo } = getISOTime(today);
 
     const setDateRange = {
       $match: {
@@ -67,6 +66,7 @@ async function getCondition(req, res, next) {
       caculateTotalAverage,
     ];
     const customDataPipeLine = [
+      setDateRange,
       groupByDateAndCategory,
       sortByDateBeforePush,
       groupByCategory,
@@ -114,18 +114,4 @@ async function getCondition(req, res, next) {
   }
 }
 
-function postRefresh(req, res, next) {
-  const { token: refreshToken } = req.headers;
-
-  try {
-    const { userId } = verifyToken(refreshToken, true);
-    const accessToken = generateToken(userId);
-
-    res.status(OK);
-    res.json({ accessToken });
-  } catch (err) {
-    next(err);
-  }
-}
-
-module.exports = { getCondition, postRefresh };
+module.exports = { getCondition };

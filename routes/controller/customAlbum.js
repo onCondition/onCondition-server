@@ -10,8 +10,10 @@ const { ERROR } = require("../../constants/messages");
 const {
   OK, BAD_REQUEST, NOT_FOUND, UNAUTHORIZED,
 } = require("../../constants/statusCodes");
+
+const getImageUrl = require("../services/getImageUrl");
 const {
-  validateBody, isValidUrl, isValidHeartCount, isValidText, isValidDate,
+  validateBody, isValidHeartCount, isValidText, isValidDate,
 } = require("../utils/validations");
 
 async function getAlbum(req, res, next) {
@@ -52,11 +54,10 @@ async function postAlbum(req, res, next) {
 
     const { userId } = req;
     const { category: categoryName } = req.params;
-    const { url, heartCount, text } = req.body;
+    const { image, heartCount, text } = req.body;
     const date = new Date(req.body.date);
 
     const invalidValues = validateBody([
-      [url, isValidUrl],
       [heartCount, isValidHeartCount],
       [text, isValidText],
       [date, isValidDate],
@@ -73,8 +74,8 @@ async function postAlbum(req, res, next) {
       category: categoryName,
     };
 
-    if (url) {
-      newAlbum.url = url;
+    if (image) {
+      newAlbum.url = await getImageUrl(image);
     }
 
     const data = await Album.create(newAlbum);
