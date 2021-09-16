@@ -3,9 +3,9 @@ const mongoose = require("mongoose");
 
 const Sleep = require("../../models/Sleep");
 const Comment = require("../../models/Comment");
-const defaultOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
+const getISOTime = require("../utils/getISOTime");
 
 const {
   validateBody, isValidHeartCount, isValidText,
@@ -13,22 +13,39 @@ const {
 
 async function getSleep(req, res, next) {
   try {
-    const pagenateOptions = { ...defaultOption };
-    const { creator } = req;
-    const { page } = req.headers;
+    const { userId } = req.params.id;
 
-    if (page) {
-      pagenateOptions.page = page;
-    }
+    const now = new Date();
+    const { pastAMonthAgo } = getISOTime(now);
 
-    const result = await Sleep.paginate({ creator }, pagenateOptions);
+    const result = await Sleep.aggregate([
+      {
+        $match: {
+          creator: userId,
+        },
+      }, {
+        $group: {
+          _id: null,
+          sum: { $sum: "$duration" },
+          avg: { $avg: "$rating.heartCount" },
+          data: { $push: "ROOT" },
+        },
+      }, {
+        $group: {
+          _id: null,
+          sum: { $sum: "$duration" },
+          avg: { $avg: "$rating.heartCount" },
+          data: { $push: "ROOT" },
+        },
+      },
+    ]);
+
+    console.log("result: ", result);
 
     res.status(OK);
     res.json({
       result: "ok",
-      data: result.docs,
-      nextPage: result.nextPage,
-      prevPage: result.prevPage,
+      data: result,
     });
   } catch (err) {
     next(err);
