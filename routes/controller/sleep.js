@@ -13,12 +13,14 @@ const {
 
 async function getSleep(req, res, next) {
   try {
-    // const { userId } = req;
+    const { userId } = req;
+
+    //"613c7e68f958fda53fd09b07"
 
     const result = await Sleep.aggregate([
       {
         $match: {
-          creator: mongoose.Types.ObjectId("613c7e68f958fda53fd09b07"),
+          creator: mongoose.Types.ObjectId(userId),
         },
       }, {
         $group: {
