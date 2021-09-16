@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 const preferenceController = require("../controller/preference");
 
-router.delete("/", preferenceController.deleteCategory);
+router.delete("/:category", preferenceController.deleteCategory);
 
 router.post("/", preferenceController.addCategory);
 
