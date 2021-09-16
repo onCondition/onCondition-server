@@ -2,6 +2,7 @@ require("dotenv").config();
 require("./config/db");
 
 const express = require("express");
+const cors = require("cors");
 const logger = require("morgan");
 const cookieParser = require("cookie-parser");
 
@@ -22,6 +23,12 @@ const friend = require("./routes/api/friend");
 const googleFit = require("./routes/api/googleFit");
 const { handleNotFound, handleDefaultError } = require("./errorHandler");
 
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(logger("dev"));
 app.use(express.json());
 app.use(cookieParser());
