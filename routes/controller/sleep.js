@@ -13,34 +13,28 @@ const {
 
 async function getSleep(req, res, next) {
   try {
-    const { userId } = req.params.id;
-
-    const now = new Date();
-    const { pastAMonthAgo } = getISOTime(now);
+    // const { userId } = req;
 
     const result = await Sleep.aggregate([
       {
         $match: {
-          creator: userId,
+          creator: mongoose.Types.ObjectId("613c7e68f958fda53fd09b07"),
         },
       }, {
         $group: {
-          _id: null,
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
           sum: { $sum: "$duration" },
           avg: { $avg: "$rating.heartCount" },
-          data: { $push: "ROOT" },
+          oid: {
+            $push: { oid: "_id" },
+          },
         },
       }, {
-        $group: {
-          _id: null,
-          sum: { $sum: "$duration" },
-          avg: { $avg: "$rating.heartCount" },
-          data: { $push: "ROOT" },
+        $sort: {
+          date: -1,
         },
       },
     ]);
-
-    console.log("result: ", result);
 
     res.status(OK);
     res.json({
