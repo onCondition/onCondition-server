@@ -1,17 +1,20 @@
 const createError = require("http-errors");
 
-const ACCESS_LEVELS = require("../../constants/accessLevels");
 const {
   getGoogleFitSessionData,
   getGoogleFitStepData,
   updateModels,
 } = require("../services/googleFit");
+const { parseBearer } = require("../helpers/tokens");
+const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
 const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");
 
 async function postGoogleToken(req, res, next) {
+  const { authorization } = req.headers;
+
   try {
-    const accessToken = req.cookies.googleAccessToken;
+    const accessToken = parseBearer(authorization);
 
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
       throw createError(UNAUTHORIZED);
