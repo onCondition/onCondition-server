@@ -1,15 +1,23 @@
 const mongoose = require("mongoose");
-const { generateToken } = require("../routes/utils/tokens");
+const { generateToken } = require("../routes/helpers/tokens");
 
 const mockUserId = "613c79ac13010b7f24663718";
 const mockActivityId = "613c79ac13010b7f24663711";
-const mockToken = generateToken(mockUserId);
+const mockToken = generateToken(mockUserId).token;
 
 const mockUser = {
   _id: mongoose.Types.ObjectId(mockUserId),
   uid: "mock uid",
   profileUrl: "mock profile",
   name: "mock user",
+};
+
+const mockComment = {
+  category: "Activity",
+  ratingId: mongoose.Types.ObjectId(mockActivityId),
+  creator: mongoose.Types.ObjectId(mockUserId),
+  date: new Date(),
+  content: "mock comment",
 };
 
 const mockActivity = {
@@ -32,6 +40,7 @@ module.exports = {
   mockToken,
   mockUserId,
   mockUser,
+  mockComment,
   mockActivityId,
   mockActivity,
   mockStep,
