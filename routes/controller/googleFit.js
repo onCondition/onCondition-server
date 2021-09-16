@@ -11,23 +11,23 @@ const { ERROR } = require("../../constants/messages");
 const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");
 
 async function postGoogleToken(req, res, next) {
-  const { authorization } = req.headers;
+  const { googleAccessToken } = req.body;
 
   try {
-    const accessToken = parseBearer(authorization);
-
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
       throw createError(UNAUTHORIZED);
     }
 
-    if (!accessToken) {
+    if (!googleAccessToken) {
       return next(createError(UNAUTHORIZED, ERROR.INVALID_TOKEN));
     }
 
-    const { activities, sleeps } = await getGoogleFitSessionData(accessToken);
+    const { activities, sleeps } = await getGoogleFitSessionData(
+      googleAccessToken,
+    );
 
     try {
-      const steps = await getGoogleFitStepData(accessToken);
+      const steps = await getGoogleFitStepData(googleAccessToken);
 
       await updateModels({ activities, sleeps, steps }, req.creator.id);
 
