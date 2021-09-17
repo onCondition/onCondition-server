@@ -22,6 +22,7 @@ const ERROR = {
   STEP_DATA_NOT_AVAILABLE: "걸음수 정보를 확인할 수 없습니다",
   INVALID_PATH: "유효하지 않은 요청 경로입니다",
   COMMENT_NOT_EXIST: "존재하지 않는 코멘트입니다",
+  USER_NOT_FOUND: "유저 정보를 확인할 수 없습니다",
 };
 
 module.exports = { ERROR };

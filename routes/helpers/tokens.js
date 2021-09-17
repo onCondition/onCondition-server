@@ -45,6 +45,10 @@ function verifyToken(token, isRefreshToken = false) {
 }
 
 function parseBearer(authorization) {
+  if (!authorization) {
+    return null;
+  }
+
   if (authorization.startsWith(BEARER)) {
     return authorization.slice(BEARER.length);
   }
