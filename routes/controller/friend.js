@@ -18,8 +18,8 @@ const {
 
 async function getFriends(req, res, next) {
   try {
-    const { creator } = mongoose.Types.ObjectId(req.creator.id);
-    const friends = await User.findById(creator).populate("friends",
+    const creator = req.creator.id;
+    const { friends } = await User.findById(creator).populate("friends",
       "_id name profileUrl stroke scores lastAccessDate").exec();
 
     const receivedRequests = await Request.find({
@@ -30,12 +30,16 @@ async function getFriends(req, res, next) {
       senderId: creator,
     });
 
-    res.status(OK);
-    res.json({
-      result: "ok",
+    const data = {
       friends,
       receivedRequests,
       sentRequests,
+    };
+
+    res.status(OK);
+    res.json({
+      result: "ok",
+      data,
     });
   } catch (err) {
     next();
