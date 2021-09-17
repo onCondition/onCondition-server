@@ -20,7 +20,7 @@ const {
 const { OK } = require("../constants/statusCodes");
 const TIME_OUT = 30000;
 
-beforeAll(() => dbConnect());
+beforeAll(async () => await dbConnect());
 afterAll(async () => await dbDisconnect());
 
 describe("activity controller test", () => {
