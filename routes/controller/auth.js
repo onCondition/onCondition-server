@@ -70,7 +70,6 @@ async function postLogin(req, res, next) {
       refreshToken,
     });
   } catch (err) {
-    console.log(err);
     next(createError(BAD_REQUEST, ERROR.INVALID_TOKEN));
   }
 }
