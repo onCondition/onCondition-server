@@ -70,11 +70,11 @@ async function setAccessLevel(req, res, next) {
         creator.lastAccessDate > pastTwoDayAgo
         && creator.lastAccessDate < pastMidnight
       ) {
-        creator.update(upsertData, { upsert: true });
+        await creator.update(upsertData, { upsert: true });
       } else if (todayMidnight < nowTime) {
-        creator.update(updateDate);
+        await creator.update(updateDate);
       } else {
-        creator.update(resetData);
+        await creator.update(resetData);
       }
 
       req.accessLevel = ACCESS_LEVELS.CREATOR;
