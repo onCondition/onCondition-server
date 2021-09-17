@@ -4,6 +4,7 @@ const { generateToken } = require("../routes/helpers/tokens");
 const mockUserId = "613c79ac13010b7f24663718";
 const mockActivityId = "613c79ac13010b7f24663711";
 const mockToken = generateToken(mockUserId).token;
+const mockCommentId = "613c79ac13010b7f24663712";
 
 const mockUser = {
   _id: mongoose.Types.ObjectId(mockUserId),
@@ -13,6 +14,7 @@ const mockUser = {
 };
 
 const mockComment = {
+  _id: mongoose.Types.ObjectId(mockCommentId),
   category: "Activity",
   ratingId: mongoose.Types.ObjectId(mockActivityId),
   creator: mongoose.Types.ObjectId(mockUserId),

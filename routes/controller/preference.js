@@ -16,13 +16,14 @@ async function deleteCategory(req, res, next) {
 
     const { category } = req.params;
     const user = await User.findById(req.userId);
-    const categoryNames = user.customCategories;
+    const categories = user.customCategories;
+    const categoryNames = categories.map(({ category }) => category);
 
     if (!categoryNames.length) {
       throw createError(BAD_REQUEST, ERROR.INVALID_ALREADY_DELETED_CATEGORY);
     }
 
-    if (categoryNames.includes(category)) {
+    if (!categoryNames.includes(category)) {
       throw createError(BAD_REQUEST, ERROR.INVALID_ALREADY_DELETED_CATEGORY);
     }
 
@@ -48,16 +49,17 @@ async function addCategory(req, res, next) {
 
     const { category, categoryType } = req.body;
     const user = await User.findById(req.userId);
-    const categoryNames = user.customCategories;
+    const categories = user.customCategories;
+    const categoryNames = categories.map(({ category }) => category);
 
     if (
-      Array.isArray(categoryNames)
-      && categoryNames.length === NUMBERS.MAX_CATEGORIES
+      Array.isArray(categories)
+      && categories.length === NUMBERS.MAX_CATEGORIES
     ) {
       throw createError(BAD_REQUEST, ERROR.INVALID_USING_MAX_CATEGORIES);
     }
 
-    if (Array.isArray(categoryNames) && categoryNames.includes(category)) {
+    if (Array.isArray(categories) && categoryNames.includes(category)) {
       throw createError(BAD_REQUEST, ERROR.INVALID_OVERLAP_CATEGORY_NAME);
     }
 
@@ -73,8 +75,4 @@ async function addCategory(req, res, next) {
   }
 }
 
-async function getNewGoogleFitData(req, res, next) {
-//
-}
-
-module.exports = { deleteCategory, addCategory, getNewGoogleFitData };
+module.exports = { deleteCategory, addCategory };
