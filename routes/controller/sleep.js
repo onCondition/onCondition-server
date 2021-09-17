@@ -5,7 +5,6 @@ const Sleep = require("../../models/Sleep");
 const Comment = require("../../models/Comment");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
-const getISOTime = require("../utils/getISOTime");
 
 const {
   validateBody, isValidHeartCount, isValidText,
@@ -15,9 +14,7 @@ async function getSleep(req, res, next) {
   try {
     const { userId } = req;
 
-    //"613c7e68f958fda53fd09b07"
-
-    const result = await Sleep.aggregate([
+    const searchResult = await Sleep.aggregate([
       {
         $match: {
           creator: mongoose.Types.ObjectId(userId),
@@ -28,12 +25,12 @@ async function getSleep(req, res, next) {
           sum: { $sum: "$duration" },
           avg: { $avg: "$rating.heartCount" },
           oid: {
-            $push: { oid: "_id" },
+            $push: "$_id",
           },
         },
       }, {
         $sort: {
-          date: -1,
+          _id: 1,
         },
       },
     ]);
@@ -41,7 +38,7 @@ async function getSleep(req, res, next) {
     res.status(OK);
     res.json({
       result: "ok",
-      data: result,
+      data: searchResult,
     });
   } catch (err) {
     next(err);
@@ -54,17 +51,6 @@ async function getSleepDetail(req, res, next) {
 
     if (!mongoose.Types.ObjectId.isValid(sleepId)) {
       throw createError(NOT_FOUND);
-    }
-
-    const { heartCount, text } = req.body;
-
-    const invalidValues = validateBody([
-      [text, isValidText],
-      [heartCount, isValidHeartCount],
-    ]);
-
-    if (invalidValues.length) {
-      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
 
     const sleep = await Sleep.findById(sleepId).populate({
@@ -80,7 +66,7 @@ async function getSleepDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", accessLevel: req.accessLevel, sleep });
+    res.json({ result: "ok", data: sleep });
   } catch (err) {
     next(err);
   }
