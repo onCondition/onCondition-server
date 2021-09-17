@@ -55,7 +55,8 @@
     ]
   },
   "jest": {
-    "verbose": true
+    "verbose": true,
+    "restoreMocks": true
   },
   "engines": {
     "node": "14.17.0",

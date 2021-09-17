@@ -17,6 +17,7 @@ const userSchema = new mongoose.Schema({
   },
   lastAccessDate: {
     type: Date,
+    default: new Date(),
   },
   stroke: {
     type: Number,

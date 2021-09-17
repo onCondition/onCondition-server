@@ -5,7 +5,7 @@ const User = require("../../models/User");
 const firebase = require("../../config/firebase");
 const { ERROR } = require("../../constants/messages");
 const {
-  OK, BAD_REQUEST, UNAUTHORIZED, NOT_FOUND,
+  OK, BAD_REQUEST, NOT_FOUND,
 } = require("../../constants/statusCodes");
 const { generateToken, verifyToken, parseBearer } = require("../helpers/tokens");
 
@@ -48,9 +48,11 @@ async function postLogin(req, res, next) {
       uid, name, picture: profileUrl,
     } = await firebase.auth().verifyIdToken(idToken);
 
-    const { doc: user } = await User.findOrCreate({
-      uid,
-    });
+    let user = await User.findOne({ uid });
+
+    if (!user) {
+      user = await User.create({ uid, profileUrl, name });
+    }
 
     if (user.profileUrl !== profileUrl || user.name !== name) {
       await user.update({
