@@ -2,4 +2,3 @@ node_modules/
 credentials/
 .env
 config/credentials.json
-Procfile
