@@ -59,7 +59,8 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
         .set("authorization", `Bearer ${mockToken}`)
         .send({ date: newDate, content: "mock comment" })
         .expect(OK)
-        .expect("Content-Type", /json/);
+        .expect("Content-Type", /json/)
+        .expect({ result: "ok" });
 
       expect(spyCreate).toBeCalledTimes(1);
       expect(spyCreate).toBeCalledWith({
@@ -69,9 +70,6 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
         date: newDate,
         content: "mock comment",
       });
-
-      expect(res.body).toBeTruthy();
-      expect(res.body.result).toBe("ok");
 
       const updatedActivity = await Activity.findById(mockActivityId);
 
@@ -111,9 +109,6 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
         .expect(OK)
         .expect("Content-Type", /json/)
         .expect({ result: "ok" });
-
-      expect(res.body).toBeTruthy();
-      expect(res.body.result).toBe("ok");
 
       expect(spyFindById).toBeCalledTimes(1);
       expect(spyFindById).toBeCalledWith(mockCommentId);
@@ -155,9 +150,6 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
         .expect("Content-Type", /json/)
         .expect({ result: "ok" });
 
-      expect(res.body).toBeTruthy();
-      expect(res.body.result).toBe("ok");
-
       expect(spyFindById).toBeCalledTimes(1);
       expect(spyFindById).toBeCalledWith(createdCommentId.toString());
 
@@ -169,8 +161,6 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
     });
 
     test("it should not delete comment by request of non-creator", async () => {
-      await User.create(mockFriend);
-
       await request(app)
         .post(`/${mockUserId}/activity/${mockActivityId}/comment`)
         .set("authorization", `Bearer ${mockToken}`)
@@ -190,7 +180,8 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
 
       const spyFindById = jest.spyOn(Comment, "findById");
 
-      const res = await request(app)
+      await User.create(mockFriend);
+      await request(app)
         .delete(`/${mockUserId}/activity/${mockActivityId}/comment/${createdCommentId}`)
         .set("authorization", `Bearer ${mockFriendToken}`)
         .expect(UNAUTHORIZED);
