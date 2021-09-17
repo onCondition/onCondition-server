@@ -90,10 +90,10 @@ async function postComment(req, res, next) {
     });
 
     const commentId = newComment._id;
-    const updated = await RatingModels[modelName].findByIdAndUpdate(ratingId,
-      { $push: { comments: commentId } }).lean();
+    const updatedRating = await RatingModels[modelName]
+      .findByIdAndUpdate(ratingId, { $push: { comments: commentId } }).lean();
 
-    if (!updated) {
+    if (!updatedRating) {
       throw createError(NOT_FOUND);
     }
 
