@@ -6,6 +6,4 @@ router.delete("/:category", preferenceController.deleteCategory);
 
 router.post("/", preferenceController.addCategory);
 
-router.get("/", preferenceController.getNewGoogleFitData);
-
 module.exports = router;
