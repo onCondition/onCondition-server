@@ -150,7 +150,7 @@ async function sendFriendRequest(req, res, next) {
 
 async function patchFriendDetail(req, res, next) {
   try {
-    const { creator } = req.creator.id;
+    const creator = req.creator.id;
     const { id: friendId } = req.params;
     const { isAccepted } = req.body.isAccepted;
 
@@ -163,8 +163,8 @@ async function patchFriendDetail(req, res, next) {
     }
 
     const request = await Request.find({
-      receiverId: mongoose.Types.ObjectId(creator),
-      senderId: mongoose.Types.ObjectId(friendId),
+      receiverId: creator,
+      senderId: friendId,
     });
 
     if (!request) {
@@ -173,11 +173,11 @@ async function patchFriendDetail(req, res, next) {
 
     if (isAccepted) {
       const receiverResult = User.findByIdAndUpdate(creator, {
-        $push: { friends: mongoose.Types.ObjectId(friendId) },
+        $push: { friends: friendId },
       });
 
       const senderResult = User.findByIdAndUpdate(friendId, {
-        $push: { friends: mongoose.Types.ObjectId(creator) },
+        $push: { friends: creator },
       });
 
       if (!receiverResult || !senderResult) {
@@ -200,7 +200,7 @@ async function patchFriendDetail(req, res, next) {
 }
 
 async function deleteFriendDetail(req, res, next) {
-  const { creator } = req.creator.id;
+  const creator = req.creator.id;
   const { id: friendId } = req.params;
 
   try {
@@ -212,8 +212,8 @@ async function deleteFriendDetail(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_FRIEND_ID);
     }
 
-    const senderResult = await User.findByIdAndUpdate(creator.id, {
-      $pull: { friends: mongoose.Types.ObjectId(friendId) },
+    const senderResult = await User.findByIdAndUpdate(creator, {
+      $pull: { friends: friendId },
     });
 
     if (!senderResult) {
@@ -221,7 +221,7 @@ async function deleteFriendDetail(req, res, next) {
     }
 
     const receiverResult = await User.findByIdAndUpdate(friendId, {
-      $pull: { friends: mongoose.Types.ObjectId(creator.id) },
+      $pull: { friends: creator },
     });
 
     if (!receiverResult) {
