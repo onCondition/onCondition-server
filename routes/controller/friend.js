@@ -22,13 +22,37 @@ async function getFriends(req, res, next) {
     const { friends } = await User.findById(creator).populate("friends",
       "_id name profileUrl stroke scores lastAccessDate").exec();
 
-    const receivedRequests = await Request.find({
-      receiverId: creator,
-    });
+    const receivedRequests = await Request.aggregate([
+      { $match: { receiverId: mongoose.Types.ObjectId(creator) } },
+      { $lookup: {
+        from: "users",
+        localField: "senderId",
+        foreignField: "_id",
+        as: "sender",
+      } },
+      { $unwind: { path: "$sender", preserveNullAndEmptyArrays: true } },
+      { $project: {
+        _id: "$sender._id",
+        profileUrl: "$sender.profileUrl",
+        name: "$sender.name",
+      } },
+    ]);
 
-    const sentRequests = await Request.find({
-      senderId: creator,
-    });
+    const sentRequests = await Request.aggregate([
+      { $match: { senderId: mongoose.Types.ObjectId(creator) } },
+      { $lookup: {
+        from: "users",
+        localField: "receiverId",
+        foreignField: "_id",
+        as: "receiver",
+      } },
+      { $unwind: { path: "$receiver", preserveNullAndEmptyArrays: true } },
+      { $project: {
+        _id: "$receiver._id",
+        profileUrl: "$receiver.profileUrl",
+        name: "$receiver.name",
+      } },
+    ]);
 
     const data = {
       friends,
