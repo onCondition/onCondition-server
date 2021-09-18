@@ -111,7 +111,7 @@ async function getProfile(req, res, next) {
 
 async function sendFriendRequest(req, res, next) {
   try {
-    const { creator } = req.creator.id;
+    const creator = req.creator.id;
     const { friendId } = req.body;
 
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
@@ -123,8 +123,8 @@ async function sendFriendRequest(req, res, next) {
     }
 
     const prevRequest = await Request.findOne({
-      receiverId: mongoose.Types.ObjectId(friendId),
-      senderId: mongoose.Types.ObjectId(creator),
+      receiverId: friendId,
+      senderId: creator,
     });
 
     if (prevRequest) {
@@ -132,8 +132,8 @@ async function sendFriendRequest(req, res, next) {
     }
 
     const request = await Request.create({
-      receiverId: mongoose.Types.ObjectId(friendId),
-      senderId: mongoose.Types.ObjectId(creator),
+      receiverId: friendId,
+      senderId: creator,
     });
 
     if (!request) {
