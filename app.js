@@ -29,7 +29,7 @@ const corsOptions = {
 
 app.use(cors(corsOptions));
 app.use(logger("dev"));
-app.use(express.json());
+app.use(express.json({ limit: "50mb" }));
 
 app.use("/", auth);
 app.use("/:creatorId/", setAccessLevel, condition);
