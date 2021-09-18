@@ -4,15 +4,11 @@ const { dbConnect, dbDisconnect } = require("./db");
 const app = require("../app");
 
 const User = require("../models/User");
-const Activity = require("../models/Activity");
-const Comment = require("../models/Comment");
 const {
   mockToken,
   friendMockToken,
   mockUserId,
   mockUser,
-  mockComment,
-  mockActivity,
 } = require("./mockData");
 
 const {
@@ -24,29 +20,22 @@ const TIME_OUT = 30000;
 beforeAll(async () => await dbConnect());
 afterAll(async () => await dbDisconnect());
 
-describe("comment controller test /:creatorId/:category/:ratingId/comment", () => {
+describe("preference controller test /:creatorId/preference/:category", () => {
   jest.setTimeout(TIME_OUT);
 
   beforeEach(async () => {
     try {
       await User.create(mockUser);
-      await Activity.create({
-        ...mockActivity,
-        comments: [mockComment._id],
-      });
-      await Comment.create(mockComment);
     } catch (err) {
-      console.log(`err: ${err} cannot set environment for mockComment`);
+      console.log(`err: ${err} cannot set environment for preference`);
     }
   });
 
   afterEach(async () => {
     try {
       await User.deleteMany();
-      await Activity.deleteMany();
-      await Comment.deleteMany();
     } catch (err) {
-      console.log(`err: ${err} cannot clean up environment for mockComment`);
+      console.log(`err: ${err} cannot clean up environment for preference`);
     }
   });
 
@@ -64,7 +53,8 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
         .set("authorization", `Bearer ${mockToken}`)
         .send({ category: "mock grid", categoryType: "grid" })
         .expect(CREATED)
-        .expect("Content-Type", /json/);
+        .expect("Content-Type", /json/)
+        .expect({ result: "OK", data: [{ category: "mock grid", categoryType: "grid" }] });
 
       expect(spyFindAndUpdate).toBeCalledTimes(1);
       expect(spyFindAndUpdate).toBeCalledWith(
@@ -114,13 +104,6 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
 
       expect(updatedUser).toHaveProperty("customCategories");
       expect(updatedUser.customCategories.length).toBe(1);
-
-      const createdCategory = updatedUser.customCategories[0];
-
-      expect(createdCategory).toHaveProperty("category");
-      expect(createdCategory).toHaveProperty("categoryType");
-      expect(createdCategory.category).toBe("duplicate");
-      expect(createdCategory.categoryType).toBe("album");
     });
   });
 
@@ -147,6 +130,10 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
         { $pull: { customCategories: { category: "dummy" } } },
         { new: true },
       );
+
+      const updatedUser = await User.findById(mockUserId);
+
+      expect(updatedUser.customCategories.length).toBe(0);
     });
 
     test("it should response error when category not exist", async () => {
@@ -154,7 +141,8 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
         .delete(`/${mockUserId}/preference/notExistCategory`)
         .set("authorization", `Bearer ${mockToken}`)
         .expect(BAD_REQUEST)
-        .expect("Content-Type", /json/);
+        .expect("Content-Type", /json/)
+        .expect({ error: ERROR.INVALID_ALREADY_DELETED_CATEGORY });
     });
 
     test("it should not delete category for other user's request", async () => {
@@ -175,10 +163,10 @@ describe("comment controller test /:creatorId/:category/:ratingId/comment", () =
       expect(spyFindById).toBeCalledWith(mockUserId);
       expect(spyFindAndUpdate).toBeCalledTimes(0);
 
-      const updatdUser = await User.findById(mockUserId);
+      const updatedUser = await User.findById(mockUserId);
 
-      expect(updatdUser.customCategories.length).toBe(1);
-      expect(updatdUser.customCategories[0].category).toBe("dummy");
+      expect(updatedUser.customCategories.length).toBe(1);
+      expect(updatedUser.customCategories[0].category).toBe("dummy");
     });
   });
 });

@@ -25,8 +25,13 @@ async function getActivity(req, res, next) {
       pagenateOptions.page = page;
     }
 
-    const result = await Activity.paginate({ userId }, pagenateOptions);
-    const stepData = await Step.findOne({ userId });
+    const result = await Activity.paginate( {
+      creator: mongoose.Types.ObjectId(userId),
+    }, pagenateOptions);
+
+    const stepData = await Step.findOne( {
+      creator: userId,
+    });
 
     res.status(OK);
     res.json({
