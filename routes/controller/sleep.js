@@ -3,7 +3,6 @@ const mongoose = require("mongoose");
 
 const Sleep = require("../../models/Sleep");
 const Comment = require("../../models/Comment");
-const defaultOption = require("../../config/paginateOption");
 const { ERROR } = require("../../constants/messages");
 const { OK, BAD_REQUEST, NOT_FOUND } = require("../../constants/statusCodes");
 
@@ -13,22 +12,33 @@ const {
 
 async function getSleep(req, res, next) {
   try {
-    const pagenateOptions = { ...defaultOption };
-    const { creator } = req;
-    const { page } = req.headers;
+    const { userId } = req;
 
-    if (page) {
-      pagenateOptions.page = page;
-    }
-
-    const result = await Sleep.paginate({ creator }, pagenateOptions);
+    const searchResult = await Sleep.aggregate([
+      {
+        $match: {
+          creator: mongoose.Types.ObjectId(userId),
+        },
+      }, {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          sum: { $sum: "$duration" },
+          avg: { $avg: "$rating.heartCount" },
+          oid: {
+            $push: "$_id",
+          },
+        },
+      }, {
+        $sort: {
+          _id: 1,
+        },
+      },
+    ]);
 
     res.status(OK);
     res.json({
       result: "ok",
-      data: result.docs,
-      nextPage: result.nextPage,
-      prevPage: result.prevPage,
+      data: searchResult,
     });
   } catch (err) {
     next(err);
@@ -41,17 +51,6 @@ async function getSleepDetail(req, res, next) {
 
     if (!mongoose.Types.ObjectId.isValid(sleepId)) {
       throw createError(NOT_FOUND);
-    }
-
-    const { heartCount, text } = req.body;
-
-    const invalidValues = validateBody([
-      [text, isValidText],
-      [heartCount, isValidHeartCount],
-    ]);
-
-    if (invalidValues.length) {
-      throw createError(BAD_REQUEST, invalidValues + ERROR.INVALID_VALUE);
     }
 
     const sleep = await Sleep.findById(sleepId).populate({
@@ -67,7 +66,7 @@ async function getSleepDetail(req, res, next) {
     }
 
     res.status(OK);
-    res.json({ result: "ok", accessLevel: req.accessLevel, sleep });
+    res.json({ result: "ok", data: sleep });
   } catch (err) {
     next(err);
   }
