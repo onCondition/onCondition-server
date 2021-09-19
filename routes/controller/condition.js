@@ -34,7 +34,7 @@ async function getCondition(req, res, next) {
       },
     };
     const sortByDate = { $sort: { _id: -1 } };
-    const caculateTotalAverage = {
+    const calculateTotalAverage = {
       $group: {
         _id: null,
         average: { $avg: "$average" },
@@ -63,7 +63,7 @@ async function getCondition(req, res, next) {
       setDateRange,
       groupByDate,
       sortByDate,
-      caculateTotalAverage,
+      calculateTotalAverage,
     ];
     const customDataPipeLine = [
       setDateRange,
