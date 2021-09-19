@@ -22,13 +22,37 @@ async function getFriends(req, res, next) {
     const { friends } = await User.findById(creator).populate("friends",
       "_id name profileUrl stroke scores lastAccessDate").exec();
 
-    const receivedRequests = await Request.find({
-      receiverId: creator,
-    });
+    const receivedRequests = await Request.aggregate([
+      { $match: { receiverId: mongoose.Types.ObjectId(creator) } },
+      { $lookup: {
+        from: "users",
+        localField: "senderId",
+        foreignField: "_id",
+        as: "sender",
+      } },
+      { $unwind: { path: "$sender", preserveNullAndEmptyArrays: true } },
+      { $project: {
+        _id: "$sender._id",
+        profileUrl: "$sender.profileUrl",
+        name: "$sender.name",
+      } },
+    ]);
 
-    const sentRequests = await Request.find({
-      senderId: creator,
-    });
+    const sentRequests = await Request.aggregate([
+      { $match: { senderId: mongoose.Types.ObjectId(creator) } },
+      { $lookup: {
+        from: "users",
+        localField: "receiverId",
+        foreignField: "_id",
+        as: "receiver",
+      } },
+      { $unwind: { path: "$receiver", preserveNullAndEmptyArrays: true } },
+      { $project: {
+        _id: "$receiver._id",
+        profileUrl: "$receiver.profileUrl",
+        name: "$receiver.name",
+      } },
+    ]);
 
     const data = {
       friends,
@@ -111,7 +135,7 @@ async function getProfile(req, res, next) {
 
 async function sendFriendRequest(req, res, next) {
   try {
-    const { creator } = req.creator.id;
+    const creator = req.creator.id;
     const { friendId } = req.body;
 
     if (req.accessLevel !== ACCESS_LEVELS.CREATOR) {
@@ -123,8 +147,8 @@ async function sendFriendRequest(req, res, next) {
     }
 
     const prevRequest = await Request.findOne({
-      receiverId: mongoose.Types.ObjectId(friendId),
-      senderId: mongoose.Types.ObjectId(creator),
+      receiverId: friendId,
+      senderId: creator,
     });
 
     if (prevRequest) {
@@ -132,8 +156,8 @@ async function sendFriendRequest(req, res, next) {
     }
 
     const request = await Request.create({
-      receiverId: mongoose.Types.ObjectId(friendId),
-      senderId: mongoose.Types.ObjectId(creator),
+      receiverId: friendId,
+      senderId: creator,
     });
 
     if (!request) {
@@ -150,7 +174,7 @@ async function sendFriendRequest(req, res, next) {
 
 async function patchFriendDetail(req, res, next) {
   try {
-    const { creator } = req.creator.id;
+    const creator = req.creator.id;
     const { id: friendId } = req.params;
     const { isAccepted } = req.body.isAccepted;
 
@@ -163,8 +187,8 @@ async function patchFriendDetail(req, res, next) {
     }
 
     const request = await Request.find({
-      receiverId: mongoose.Types.ObjectId(creator),
-      senderId: mongoose.Types.ObjectId(friendId),
+      receiverId: creator,
+      senderId: friendId,
     });
 
     if (!request) {
@@ -173,11 +197,11 @@ async function patchFriendDetail(req, res, next) {
 
     if (isAccepted) {
       const receiverResult = User.findByIdAndUpdate(creator, {
-        $push: { friends: mongoose.Types.ObjectId(friendId) },
+        $push: { friends: friendId },
       });
 
       const senderResult = User.findByIdAndUpdate(friendId, {
-        $push: { friends: mongoose.Types.ObjectId(creator) },
+        $push: { friends: creator },
       });
 
       if (!receiverResult || !senderResult) {
@@ -200,7 +224,7 @@ async function patchFriendDetail(req, res, next) {
 }
 
 async function deleteFriendDetail(req, res, next) {
-  const { creator } = req.creator.id;
+  const creator = req.creator.id;
   const { id: friendId } = req.params;
 
   try {
@@ -212,8 +236,8 @@ async function deleteFriendDetail(req, res, next) {
       throw createError(BAD_REQUEST, ERROR.INVALID_FRIEND_ID);
     }
 
-    const senderResult = await User.findByIdAndUpdate(creator.id, {
-      $pull: { friends: mongoose.Types.ObjectId(friendId) },
+    const senderResult = await User.findByIdAndUpdate(creator, {
+      $pull: { friends: friendId },
     });
 
     if (!senderResult) {
@@ -221,7 +245,7 @@ async function deleteFriendDetail(req, res, next) {
     }
 
     const receiverResult = await User.findByIdAndUpdate(friendId, {
-      $pull: { friends: mongoose.Types.ObjectId(creator.id) },
+      $pull: { friends: creator },
     });
 
     if (!receiverResult) {
