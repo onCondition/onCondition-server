@@ -1,9 +1,9 @@
 const request = require("supertest");
+const { OAuth2Client } = require("google-auth-library");
+jest.mock("google-auth-library");
 
 const { dbConnect, dbDisconnect } = require("./db");
 const app = require("../app");
-const firebase = require("../config/firebase");
-
 const User = require("../models/User");
 const { mockUser, mockToken } = require("./mockData");
 const { OK } = require("../constants/statusCodes");
@@ -20,45 +20,48 @@ describe("POST /login", () => {
     }
   });
 
-  it("should get user info from firebase admin", async () => {
+  it("should get user info from google oauth token", async () => {
     const spyVerifyToken = jest.fn()
       .mockReturnValueOnce({
-        uid: mockUser.uid,
-        picture: mockUser.profileUrl,
-        name: mockUser.name,
+        payload: {
+          sub: mockUser.uid,
+          picture: mockUser.profileUrl,
+          name: mockUser.name,
+        },
       });
 
-    const mockAuth = jest.spyOn(firebase, "auth")
-      .mockReturnValueOnce({ verifyIdToken: spyVerifyToken });
+    OAuth2Client.prototype.verifyIdToken = spyVerifyToken;
 
     await request(app)
       .post("/login")
-      .set("authorization", "Bearer mockFirebaseIdToken")
+      .set("authorization", "Bearer mockGoogleIdToken")
       .expect(OK);
 
-    expect(mockAuth).toBeCalledTimes(1);
-    expect(mockAuth).toBeCalledWith();
     expect(spyVerifyToken).toBeCalledTimes(1);
-    expect(spyVerifyToken).toBeCalledWith("mockFirebaseIdToken");
+    expect(spyVerifyToken).toBeCalledWith({
+      audience: process.env.GOOGLE_CLIENT_ID,
+      idToken: "mockGoogleIdToken",
+    });
   });
 
   describe("should handle when proper idToken is sended", () => {
     beforeEach(() => {
       const spyVerifyToken = jest.fn()
         .mockReturnValueOnce({
-          uid: mockUser.uid,
-          picture: mockUser.profileUrl,
-          name: mockUser.name,
+          payload: {
+            sub: mockUser.uid,
+            picture: mockUser.profileUrl,
+            name: mockUser.name,
+          },
         });
 
-      jest.spyOn(firebase, "auth")
-        .mockReturnValueOnce({ verifyIdToken: spyVerifyToken });
+      OAuth2Client.prototype.verifyIdToken = spyVerifyToken;
     });
 
     it("should create user when new user's idToken is sended", async () => {
       await request(app)
         .post("/login")
-        .set("authorization", "Bearer mockFirebaseIdToken")
+        .set("authorization", "Bearer mockGoogleIdToken")
         .expect(OK)
         .expect("Content-Type", /json/);
 
@@ -72,7 +75,7 @@ describe("POST /login", () => {
     it("should create respond accessToken when idToken is sended", async () => {
       const res = await request(app)
         .post("/login")
-        .set("authorization", "Bearer mockFirebaseIdToken")
+        .set("authorization", "Bearer mockGoogleIdToken")
         .expect(OK)
         .expect("Content-Type", /json/);
 
@@ -105,17 +108,18 @@ describe("POST /login", () => {
 
     const spyVerifyToken = jest.fn()
       .mockReturnValueOnce({
-        uid: mockUser.uid,
-        picture: "updated picture",
-        name: mockUser.name,
+        payload: {
+          sub: mockUser.uid,
+          picture: "updated picture",
+          name: mockUser.name,
+        },
       });
 
-    jest.spyOn(firebase, "auth")
-      .mockReturnValueOnce({ verifyIdToken: spyVerifyToken });
+    OAuth2Client.prototype.verifyIdToken = spyVerifyToken;
 
     await request(app)
       .post("/login")
-      .set("authorization", "Bearer mockFirebaseIdToken")
+      .set("authorization", "Bearer mockGoogleIdToken")
       .expect(OK)
       .expect("Content-Type", /json/);
 
