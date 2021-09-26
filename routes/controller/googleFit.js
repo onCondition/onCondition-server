@@ -5,7 +5,6 @@ const {
   getGoogleFitStepData,
   updateModels,
 } = require("../services/googleFit");
-const { parseBearer } = require("../helpers/tokens");
 const ACCESS_LEVELS = require("../../constants/accessLevels");
 const { ERROR } = require("../../constants/messages");
 const { OK, UNAUTHORIZED } = require("../../constants/statusCodes");

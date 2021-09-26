@@ -1,13 +1,15 @@
 const mongoose = require("mongoose");
 const createError = require("http-errors");
+const { OAuth2Client } = require("google-auth-library");
 
 const User = require("../../models/User");
-const firebase = require("../../config/firebase");
 const { ERROR } = require("../../constants/messages");
 const {
   OK, BAD_REQUEST, NOT_FOUND,
 } = require("../../constants/statusCodes");
 const { generateToken, verifyToken, parseBearer } = require("../helpers/tokens");
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 async function getUserInfos(req, res, next) {
   const { authorization } = req.headers;
@@ -26,11 +28,12 @@ async function getUserInfos(req, res, next) {
       throw createError(NOT_FOUND, ERROR.USER_NOT_FOUND);
     }
 
-    const { customCategories, lastAccessDate } = user;
+    const { name, customCategories, lastAccessDate } = user;
 
     res.status(OK);
     res.json({
       userId,
+      name,
       customCategories,
       lastAccessDate,
     });
@@ -44,9 +47,15 @@ async function postLogin(req, res, next) {
 
   try {
     const idToken = parseBearer(authorization);
+    const loginTicket = await googleClient.verifyIdToken({
+      idToken,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
     const {
-      uid, name, picture: profileUrl,
-    } = await firebase.auth().verifyIdToken(idToken);
+      sub: uid,
+      name,
+      picture: profileUrl,
+    } = loginTicket.payload;
 
     let user = await User.findOne({ uid });
 
